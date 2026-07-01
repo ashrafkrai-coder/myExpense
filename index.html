@@ -545,10 +545,6 @@
         .btn-sm.install { color: var(--indigo); display: none; }
         .btn-sm.install.show { display: inline-flex; align-items: center; gap: 6px; }
         .btn-sm.install:hover { background: var(--indigo-bg); border-color: var(--indigo); }
-        
-        @media (max-width: 640px) {
-            .btn-sm.install { display: inline-flex; align-items: center; gap: 6px; }
-        }
 
         .user-chip {
             display: inline-flex;
@@ -1649,20 +1645,9 @@
             }
         });
 
-        // Fallback: Check after 3 seconds if beforeinstallprompt fired
-        setTimeout(() => {
-            if (!deferredInstallPrompt && !isStandaloneApp()) {
-                console.warn('⚠️ beforeinstallprompt tidak terpicu dalam 3 detik');
-                console.log('ℹ Petua: Pastikan HTTPS, Service Worker aktif, atau gunakan menu browser untuk install');
-                installBtn.classList.add('show');
-                console.log('✓ Install button ditampilkan (fallback mode)');
-            }
-        }, 3000);
-
         installBtn.addEventListener('click', async () => {
             if (!deferredInstallPrompt) {
                 console.warn('✗ deferredInstallPrompt is null - beforeinstallprompt tidak tersedia');
-                showToast('⚠️ Install tidak tersedia. Gunakan menu browser (3 titik) > "Pasang aplikasi"');
                 return;
             }
             console.log('→ Install prompt dimulai...');
