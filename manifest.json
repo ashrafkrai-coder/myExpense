@@ -1,0 +1,30 @@
+{
+  "short_name": "MyExpense",
+  "name": "MyExpense — Rekod Perbelanjaan Bulanan",
+  "description": "Aplikasi merekod perbelanjaan bulanan — Bil, Pendidikan, Petrol, Dapur, Pinjaman, Lain-lain.",
+  "icons": [
+    {
+      "src": "icons/icon-192.png",
+      "type": "image/png",
+      "sizes": "192x192",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icons/icon-512.png",
+      "type": "image/png",
+      "sizes": "512x512",
+      "purpose": "any maskable"
+    }
+  ],
+  "id": "./",
+  "start_url": "./index.html",
+  "background_color": "#eef2ff",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "theme_color": "#4f46e5",
+  "lang": "ms",
+  "dir": "ltr",
+  "categories": ["finance", "productivity", "utilities"],
+  "scope": "./",
+  "prefer_related_applications": false
+}
