@@ -545,6 +545,10 @@
         .btn-sm.install { color: var(--indigo); display: none; }
         .btn-sm.install.show { display: inline-flex; align-items: center; gap: 6px; }
         .btn-sm.install:hover { background: var(--indigo-bg); border-color: var(--indigo); }
+        
+        @media (max-width: 640px) {
+            .btn-sm.install { display: inline-flex; align-items: center; gap: 6px; }
+        }
 
         .user-chip {
             display: inline-flex;
@@ -608,45 +612,50 @@
         }
 
         @media (max-width: 420px) {
-            .header { padding: 24px 14px 28px; }
+            .header { padding: 20px 14px 24px; }
             .header-top { 
-                flex-direction: column; 
-                gap: 16px; 
+                flex-direction: row; 
+                justify-content: space-between;
                 align-items: center;
-                text-align: center;
+                gap: 10px;
+                margin-bottom: 16px;
+                text-align: left;
             }
             .header-brand { 
-                flex-direction: column; 
-                gap: 8px; 
+                flex-direction: row; 
+                gap: 0; 
                 align-items: center;
-                width: 100%;
+                width: auto;
             }
-            .header-brand .logo { width: 48px; height: 48px; font-size: 24px; }
-            .header-brand h1 { font-size: 21px; font-weight: 800; letter-spacing: -0.5px; margin-top: 2px; }
+            .header-brand .logo { display: none; }
+            .header-brand h1 { font-size: 18px; font-weight: 800; letter-spacing: -0.3px; margin: 0; }
             .month-selector { 
                 width: 100%; 
                 justify-content: center;
-                font-size: 13px; 
-                padding: 8px 12px; 
+                font-size: 12px; 
+                padding: 8px 0; 
+                gap: 10px;
+                margin-top: 12px;
             }
-            .month-selector button { font-size: 18px; width: 28px; height: 28px; }
-            .month-selector span { font-size: 13px; min-width: 100px; }
+            .month-selector button { font-size: 16px; width: 28px; height: 28px; }
+            .month-selector span { font-size: 12px; min-width: 90px; }
             .user-chip { 
-                position: absolute;
-                top: 16px;
-                right: 14px;
+                position: relative;
+                top: auto;
+                right: auto;
                 font-size: 11px; 
                 padding: 6px 10px; 
                 gap: 6px; 
                 max-width: 140px; 
-                background: rgba(79,70,229,0.25);
+                background: rgba(255,255,255,0.2);
                 border: 1.5px solid rgba(255,255,255,0.3);
                 border-radius: 20px;
                 z-index: 100;
+                flex-shrink: 0;
             }
-            .user-chip-avatar { width: 28px; height: 28px; font-size: 12px; font-weight: 900; border-width: 1.5px; }
-            .total-section { margin-top: 8px; padding-top: 10px; border-top: 1px solid rgba(255,255,255,0.15); }
-            .total-section .amount { font-size: clamp(28px, 7vw, 40px); margin-top: 6px; letter-spacing: -1px; }
+            .user-chip-avatar { width: 24px; height: 24px; font-size: 11px; font-weight: 900; border-width: 1.5px; }
+            .total-section { margin-top: 12px; padding-top: 12px; border-top: 1px solid rgba(255,255,255,0.15); }
+            .total-section .amount { font-size: clamp(24px, 6vw, 36px); margin-top: 6px; letter-spacing: -0.8px; }
             .total-section .label { font-size: 11px; opacity: 0.85; letter-spacing: 0.8px; }
             .category-grid { grid-template-columns: 1fr; }
             .fab { width: 48px; height: 48px; font-size: 22px; bottom: 16px; right: 16px; }
@@ -1638,9 +1647,20 @@
             }
         });
 
+        // Fallback: Check after 3 seconds if beforeinstallprompt fired
+        setTimeout(() => {
+            if (!deferredInstallPrompt && !isStandaloneApp()) {
+                console.warn('⚠️ beforeinstallprompt tidak terpicu dalam 3 detik');
+                console.log('ℹ Petua: Pastikan HTTPS, Service Worker aktif, atau gunakan menu browser untuk install');
+                installBtn.classList.add('show');
+                console.log('✓ Install button ditampilkan (fallback mode)');
+            }
+        }, 3000);
+
         installBtn.addEventListener('click', async () => {
             if (!deferredInstallPrompt) {
-                console.warn('✗ deferredInstallPrompt is null');
+                console.warn('✗ deferredInstallPrompt is null - beforeinstallprompt tidak tersedia');
+                showToast('⚠️ Install tidak tersedia. Gunakan menu browser (3 titik) > "Pasang aplikasi"');
                 return;
             }
             console.log('→ Install prompt dimulai...');
