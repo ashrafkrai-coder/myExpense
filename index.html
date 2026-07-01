@@ -6,7 +6,11 @@
     <title>MyExpense - Rekod Belanja</title>
     <meta name="theme-color" content="#4f46e5">
     
-    <!-- Pustaka Carta & Supabase -->
+    <link rel="manifest" href="manifest.json">
+    <link rel="apple-touch-icon" href="icon-192.png">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.8/dist/umd/supabase.js"></script>
 
@@ -120,13 +124,11 @@
     </header>
 
     <main class="main">
-        <!-- CARTA 1: Pecahan Kategori Bulan Dipilih (Doughnut - BERWARNA-WARNI & INTERAKTIF) -->
         <div class="chart-section" id="chartSection" style="display:none;">
             <h4 style="margin-bottom:12px; font-size:13px; color:var(--text-secondary);">📊 Pecahan Belanja Bulan Ini</h4>
             <div class="chart-container"><canvas id="expenseChart"></canvas></div>
         </div>
 
-        <!-- CARTA 2: Perbandingan Antara Bulan (Bar Chart) -->
         <div class="chart-section" id="compareChartSection" style="display:none;">
             <h4 style="margin-bottom:12px; font-size:13px; color:var(--text-secondary);">📈 Trend Perbandingan Bulanan</h4>
             <div class="chart-container" style="height:200px;"><canvas id="compareChart"></canvas></div>
@@ -149,7 +151,6 @@
 
     <button class="fab" id="fabBtn">+</button>
 
-    <!-- Modal Tambah Transaksi -->
     <div class="modal-overlay" id="modalOverlay">
         <div class="modal">
             <h2>Tambah Perbelanjaan</h2>
@@ -183,7 +184,6 @@
         </div>
     </div>
 
-    <!-- Modal Login -->
     <div class="modal-overlay" id="authOverlay">
         <div class="modal">
             <h2>Login Pengguna</h2>
@@ -213,14 +213,13 @@
             }
         } catch(err) { console.error(err); }
 
-        // Definisi Kategori dan Kod Warna Khusus
         const CATEGORIES = {
-            bil: { name: 'Bil & Utiliti', color: '#ef4444' },     // Merah
-            pendidikan: { name: 'Yuran Pendidikan', color: '#3b82f6' }, // Biru
-            petrol: { name: 'Petrol', color: '#f59e0b' },         // Kuning/Amber
-            dapur: { name: 'Belanja Dapur', color: '#10b981' },     // Hijau
-            pinjaman: { name: 'Pinjaman', color: '#8b5cf6' },     // Ungu
-            lain: { name: 'Lain-lain', color: '#ec4899' }         // Pink
+            bil: { name: 'Bil & Utiliti', color: '#ef4444' },     
+            pendidikan: { name: 'Yuran Pendidikan', color: '#3b82f6' }, 
+            petrol: { name: 'Petrol', color: '#f59e0b' },         
+            dapur: { name: 'Belanja Dapur', color: '#10b981' },     
+            pinjaman: { name: 'Pinjaman', color: '#8b5cf6' },     
+            lain: { name: 'Lain-lain', color: '#ec4899' }         
         };
 
         let expenses = JSON.parse(localStorage.getItem('myexpense_data')) || [];
@@ -316,7 +315,6 @@
             renderCompareChart(targetYear);
         }
 
-        // AKSI DAFTAR TRANSAKSI
         document.getElementById('fabBtn').addEventListener('click', () => {
             document.getElementById('dateInput').value = new Date().toISOString().split('T')[0];
             document.getElementById('modalOverlay').classList.add('open');
@@ -371,15 +369,10 @@
             }
         });
 
-        // FUNGSI UTAMA: PENYELESAIAN MASALAH WARNA HITAM DAN REKA BENTUK DONUT
         function renderChart(catTotals) {
             if (typeof Chart === 'undefined') return;
             const ctx = document.getElementById('expenseChart').getContext('2d');
-            
-            // Mengunci susunan indeks bagi kategori
             const catKeys = Object.keys(CATEGORIES);
-            
-            // Pemetaan data nilai RM, kod warna, dan nama label berdasarkan indeks yang seragam
             const dataValues = catKeys.map(key => catTotals[key] || 0);
             const colors = catKeys.map(key => CATEGORIES[key].color);
             const labels = catKeys.map(key => CATEGORIES[key].name);
@@ -415,12 +408,7 @@
                             legend: { 
                                 display: true, 
                                 position: 'bottom',
-                                labels: {
-                                    boxWidth: 12,
-                                    padding: 10,
-                                    font: { size: 11, family: 'Segoe UI' },
-                                    color: 'var(--text-secondary)'
-                                }
+                                labels: { boxWidth: 12, padding: 10, font: { size: 11, family: 'Segoe UI' }, color: 'var(--text-secondary)' }
                             }, 
                             tooltip: { 
                                 enabled: true,
@@ -438,40 +426,24 @@
             }
         }
 
-        // CARTA 2: BAR CHART (PERBANDINGAN BULANAN)
         function renderCompareChart(targetYear) {
             if (typeof Chart === 'undefined') return;
             const ctx = document.getElementById('compareChart').getContext('2d');
-            
             let monthlyTotals = new Array(12).fill(0);
             expenses.forEach(exp => {
                 if (!exp.date) return;
-                let itemMonth = -1;
-                let itemYear = -1;
-                
+                let itemMonth = -1, itemYear = -1;
                 if (typeof exp.date === 'string' && exp.date.includes('-')) {
                     const parts = exp.date.split('-');
-                    if (parts.length >= 2) {
-                        itemYear = parseInt(parts[0], 10);
-                        itemMonth = parseInt(parts[1], 10) - 1;
-                    }
+                    if (parts.length >= 2) { itemYear = parseInt(parts[0], 10); itemMonth = parseInt(parts[1], 10) - 1; }
                 } else {
                     const d = new Date(exp.date);
-                    if (!isNaN(d.getTime())) {
-                        itemYear = d.getFullYear();
-                        itemMonth = d.getMonth();
-                    }
+                    if (!isNaN(d.getTime())) { itemYear = d.getFullYear(); itemMonth = d.getMonth(); }
                 }
-                if (itemYear === targetYear && itemMonth >= 0 && itemMonth < 12) {
-                    monthlyTotals[itemMonth] += parseFloat(exp.amount);
-                }
+                if (itemYear === targetYear && itemMonth >= 0 && itemMonth < 12) { monthlyTotals[itemMonth] += parseFloat(exp.amount); }
             });
 
-            if (!monthlyTotals.some(v => v > 0)) {
-                document.getElementById('compareChartSection').style.display = 'none';
-                return;
-            }
-
+            if (!monthlyTotals.some(v => v > 0)) { document.getElementById('compareChartSection').style.display = 'none'; return; }
             document.getElementById('compareChartSection').style.display = 'block';
             const shortMonths = ['Jan', 'Feb', 'Mac', 'Apr', 'Mei', 'Jun', 'Jul', 'Ogos', 'Sep', 'Okt', 'Nov', 'Dis'];
 
@@ -484,21 +456,12 @@
                     type: 'bar',
                     data: {
                         labels: shortMonths,
-                        datasets: [{
-                            label: 'Jumlah Belanja (RM)',
-                            data: monthlyTotals,
-                            backgroundColor: '#6366f1',
-                            borderRadius: 6,
-                            borderSkipped: false,
-                        }]
+                        datasets: [{ label: 'Jumlah Belanja (RM)', data: monthlyTotals, backgroundColor: '#6366f1', borderRadius: 6, borderSkipped: false }]
                     },
                     options: {
                         responsive: true,
                         maintainAspectRatio: false,
-                        plugins: {
-                            legend: { display: false },
-                            title: { display: true, text: `Tahun ${targetYear}`, font: { size: 11, family: 'Segoe UI' }, color: 'var(--text-secondary)' }
-                        },
+                        plugins: { legend: { display: false }, title: { display: true, text: `Tahun ${targetYear}`, font: { size: 11, family: 'Segoe UI' }, color: 'var(--text-secondary)' } },
                         scales: {
                             y: { beginAtZero: true, grid: { display: false }, ticks: { font: { size: 10 }, color: 'var(--text-muted)' } },
                             x: { grid: { display: false }, ticks: { font: { size: 10 }, color: 'var(--text-muted)' } }
@@ -508,7 +471,6 @@
             }
         }
 
-        // KAWALAN DIALOG LOGIN
         const authOverlay = document.getElementById('authOverlay');
         document.getElementById('userBtn').addEventListener('click', () => authOverlay.classList.add('open'));
         document.getElementById('authCancelBtn').addEventListener('click', () => authOverlay.classList.remove('open'));
@@ -531,64 +493,43 @@
             }
         }
 
-        // SINKRONISASI DATA DARI AWAN (SUPABASE)
         async function fetchFromSupabaseNoFilter() {
             if (!supabaseClient) { updateSyncStatus('error', '⚠ Offline'); return; }
             updateSyncStatus('syncing', '↻ Membaca data...');
             try {
                 const { data, error } = await supabaseClient.from('expenses').select('*');
                 if (error) throw error;
-                
                 if (data && data.length > 0) {
                     let localMap = new Map(expenses.map(obj => [obj.id, obj]));
-                    data.forEach(item => {
-                        if(item.id) localMap.set(item.id, item);
-                    });
+                    data.forEach(item => { if(item.id) localMap.set(item.id, item); });
                     expenses = Array.from(localMap.values());
                     localStorage.setItem('myexpense_data', JSON.stringify(expenses));
-                    
                     showToast(`Berjaya menarik masuk ${data.length} rekod dari awan!`, 'success');
-                } else {
-                    showToast('Pangkalan data Supabase anda kosong.');
-                }
-                autoDetectDataMonth();
-                updateMonthDisplay();
-                updateSyncStatus('synced', '✓ Berjaya');
-            } catch (err) {
-                console.error(err);
-                updateSyncStatus('error', '⚠ Ralat Synchronize');
-            }
+                } else { showToast('Pangkalan data Supabase anda kosong.'); }
+                autoDetectDataMonth(); updateMonthDisplay(); updateSyncStatus('synced', '✓ Berjaya');
+            } catch (err) { console.error(err); updateSyncStatus('error', '⚠ Ralat Synchronize'); }
         }
 
-        document.getElementById('forceSyncBtn').addEventListener('click', () => {
-            fetchFromSupabaseNoFilter();
-        });
-
-        async function syncInsertToSupabase(record) {
-            if (!supabaseClient) return;
-            try { await supabaseClient.from('expenses').insert([record]); } catch (e) { console.error(e); }
-        }
-
-        async function syncDeleteFromSupabase(id) {
-            if (!supabaseClient) return;
-            try { await supabaseClient.from('expenses').delete().eq('id', id); } catch (e) {}
-        }
-
-        function updateSyncStatus(status, text) {
-            const el = document.getElementById('syncStatus');
-            if(el) { el.className = `sync-status ${status}`; el.innerText = text; }
-        }
-
-        function showToast(message, type = 'success') {
-            const t = document.getElementById('toast');
-            if(t) { t.innerText = message; t.className = `toast show ${type}`; setTimeout(() => t.classList.remove('show'), 3000); }
-        }
+        document.getElementById('forceSyncBtn').addEventListener('click', () => { fetchFromSupabaseNoFilter(); });
+        async function syncInsertToSupabase(record) { if (!supabaseClient) return; try { await supabaseClient.from('expenses').insert([record]); } catch (e) { console.error(e); } }
+        async function syncDeleteFromSupabase(id) { if (!supabaseClient) return; try { await supabaseClient.from('expenses').delete().eq('id', id); } catch (e) {} }
+        function updateSyncStatus(status, text) { const el = document.getElementById('syncStatus'); if(el) { el.className = `sync-status ${status}`; el.innerText = text; } }
+        function showToast(message, type = 'success') { const t = document.getElementById('toast'); if(t) { t.innerText = message; t.className = `toast show ${type}`; setTimeout(() => t.classList.remove('show'), 3000); } }
 
         window.addEventListener('load', () => {
             autoDetectDataMonth();
             updateMonthDisplay();
             checkLoginStatus();
         });
+
+        // RECOLOR & DAFTAR SERVICE WORKER UNTUK PEMASANGAN PWA
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('./sw.js')
+                .then(reg => console.log('PWA Service Worker berjaya didaftarkan!', reg.scope))
+                .catch(err => console.log('Pendaftaran Service Worker Gagal:', err));
+            });
+        }
     </script>
 </body>
 </html>
