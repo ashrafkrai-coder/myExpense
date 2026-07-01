@@ -1,1 +1,30 @@
-{\n  \"$schema\": \"https://json.schemastore.org/web-manifest-combined.json\",\n  \"short_name\": \"MyExpense\",\n  \"name\": \"MyExpense — Rekod Perbelanjaan Bulanan\",\n  \"description\": \"Aplikasi merekod perbelanjaan bulanan — Bil, Pendidikan, Petrol, Dapur, Pinjaman, Lain-lain. Offline-ready, sync otomatis ke cloud.\",\n  \"icons\": [\n    {\n      \"src\": \"icon-192.png\",\n      \"type\": \"image/png\",\n      \"sizes\": \"192x192\",\n      \"purpose\": \"any\"\n    },\n    {\n      \"src\": \"icon-192.png\",\n      \"type\": \"image/png\",\n      \"sizes\": \"192x192\",\n      \"purpose\": \"maskable\"\n    },\n    {\n      \"src\": \"icon-512.png\",\n      \"type\": \"image/png\",\n      \"sizes\": \"512x512\",\n      \"purpose\": \"any\"\n    },\n    {\n      \"src\": \"icon-512.png\",\n      \"type\": \"image/png\",\n      \"sizes\": \"512x512\",\n      \"purpose\": \"maskable\"\n    }\n  ],\n  \"id\": \"./\",\n  \"start_url\": \"./index.html\",\n  \"scope\": \"./\",\n  \"background_color\": \"#eef2ff\",\n  \"display\": \"standalone\",\n  \"orientation\": \"portrait-primary\",\n  \"theme_color\": \"#4f46e5\",\n  \"screenshots\": [\n    {\n      \"src\": \"icon-192.png\",\n      \"type\": \"image/png\",\n      \"sizes\": \"192x192\"\n    },\n    {\n      \"src\": \"icon-512.png\",\n      \"type\": \"image/png\",\n      \"sizes\": \"512x512\"\n    }\n  ],\n  \"prefer_related_applications\": false,\n  \"categories\": [\"finance\", \"productivity\", \"utilities\"],\n  \"shortcuts\": [\n    {\n      \"name\": \"Tambah Perbelanjaan\",\n      \"short_name\": \"Tambah\",\n      \"description\": \"Tambah perbelanjaan baru dengan cepat\",\n      \"url\": \"./index.html\",\n      \"icons\": [\n        {\n          \"src\": \"icon-192.png\",\n          \"sizes\": \"192x192\",\n          \"type\": \"image/png\"\n        }\n      ]\n    }\n  ],\n  \"lang\": \"ms\",\n  \"dir\": \"ltr\"\n}
+{
+  "short_name": "MyExpense",
+  "name": "MyExpense - Rekod Belanja",
+  "description": "Aplikasi merekod perbelanjaan bulanan â€” ringkas, pantas, offline-ready, sync Supabase",
+  "icons": [
+    {
+      "src": "icon-192.png",
+      "type": "image/png",
+      "sizes": "192x192",
+      "purpose": "any"
+    },
+    {
+      "src": "icon-192.png",
+      "type": "image/png",
+      "sizes": "192x192",
+      "purpose": "maskable"
+    },
+    {
+      "src": "icon-512.png",
+      "type": "image/png",
+      "sizes": "512x512",
+      "purpose": "any"
+    }
+  ],
+  "start_url": "/index.html",
+  "background_color": "#ffffff",
+  "theme_color": "#4f46e5",
+  "display": "standalone",
+  "orientation": "portrait"
+}

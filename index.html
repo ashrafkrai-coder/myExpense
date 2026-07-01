@@ -4,750 +4,94 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>MyExpense - Rekod Belanja</title>
-    <meta name="description" content="Aplikasi merekod perbelanjaan bulanan — ringkas, pantas, offline-ready, sync Supabase">
     <meta name="theme-color" content="#4f46e5">
-    <meta name="color-scheme" content="light dark">
-    <meta name="mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="MyExpense">
-    <meta name="application-name" content="MyExpense">
-    <link rel="manifest" href="manifest.json">
-    <link rel="icon" href="icon-192.png" sizes="192x192" type="image/png">
-    <link rel="icon" href="icon-512.png" sizes="512x512" type="image/png">
-    <link rel="apple-touch-icon" href="icon-192.png" sizes="192x192">
-    <link rel="apple-touch-icon" href="icon-512.png" sizes="512x512">
-    <link rel="shortcut icon" href="icon-192.png">
+    
+    <!-- Pustaka Carta & Supabase -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.8/dist/umd/supabase.js"></script>
 
     <style>
-        *, *::before, *::after {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
-
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
         :root {
-            --indigo: #4f46e5;
-            --indigo-light: #818cf8;
-            --indigo-dark: #3730a3;
-            --indigo-bg: #eef2ff;
-            --red: #ef4444;
-            --red-bg: #fef2f2;
-            --green: #10b981;
-            --green-bg: #ecfdf5;
-            --amber: #f59e0b;
-            --amber-bg: #fffbeb;
-            --blue: #3b82f6;
-            --blue-bg: #eff6ff;
-            --purple: #8b5cf6;
-            --purple-bg: #f5f3ff;
-            --pink: #ec4899;
-            --pink-bg: #fdf2f8;
-            --surface: #ffffff;
-            --surface-alt: #f8fafc;
-            --text: #0f172a;
-            --text-secondary: #64748b;
-            --text-muted: #94a3b8;
-            --border: #e2e8f0;
-            --shadow-sm: 0 1px 2px rgba(0,0,0,0.04);
-            --shadow: 0 4px 24px rgba(79,70,229,0.08);
-            --shadow-lg: 0 8px 40px rgba(79,70,229,0.12);
-            --radius: 16px;
-            --radius-sm: 10px;
-            --radius-xs: 6px;
-            --transition: 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-            --max-width: 720px;
-            --font: 'Segoe UI', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+            --indigo: #4f46e5; --indigo-light: #818cf8; --indigo-dark: #3730a3; --indigo-bg: #eef2ff;
+            --red: #ef4444; --red-bg: #fef2f2; --green: #10b981; --green-bg: #ecfdf5;
+            --amber: #f59e0b; --amber-bg: #fffbeb; --blue: #3b82f6; --blue-bg: #eff6ff;
+            --purple: #8b5cf6; --purple-bg: #f5f3ff; --pink: #ec4899; --pink-bg: #fdf2f8;
+            --surface: #ffffff; --surface-alt: #f8fafc; --text: #0f172a; --text-secondary: #64748b;
+            --text-muted: #94a3b8; --border: #e2e8f0; --shadow-sm: 0 1px 2px rgba(0,0,0,0.04);
+            --shadow: 0 4px 24px rgba(79,70,229,0.08); --shadow-lg: 0 8px 40px rgba(79,70,229,0.12);
+            --radius: 16px; --radius-sm: 10px; --radius-xs: 6px; --transition: 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            --max-width: 720px; --font: 'Segoe UI', system-ui, -apple-system, sans-serif;
         }
-
         @media (prefers-color-scheme: dark) {
             :root {
-                --indigo-bg: #0f0f1a;
-                --surface: #1a1a2e;
-                --surface-alt: #16162a;
-                --text: #e2e8f0;
-                --text-secondary: #94a3b8;
-                --text-muted: #64748b;
-                --border: #2d2d44;
-                --shadow: 0 4px 24px rgba(0,0,0,0.4);
-                --shadow-lg: 0 8px 40px rgba(0,0,0,0.6);
-                --red-bg: rgba(239,68,68,0.08);
-                --green-bg: rgba(16,185,129,0.08);
-                --amber-bg: rgba(245,158,11,0.08);
-                --blue-bg: rgba(59,130,246,0.08);
-                --purple-bg: rgba(139,92,246,0.08);
-                --pink-bg: rgba(236,72,153,0.08);
+                --indigo-bg: #0f0f1a; --surface: #1a1a2e; --surface-alt: #16162a; --text: #e2e8f0;
+                --text-secondary: #94a3b8; --text-muted: #64748b; --border: #2d2d44;
+                --shadow: 0 4px 24px rgba(0,0,0,0.4); --shadow-lg: 0 8px 40px rgba(0,0,0,0.6);
+                --red-bg: rgba(239,68,68,0.08); --green-bg: rgba(16,185,129,0.08);
             }
         }
-
-        html {
-            scroll-behavior: smooth;
-            -webkit-tap-highlight-color: transparent;
-        }
-
-        body {
-            font-family: var(--font);
-            background: var(--indigo-bg);
-            color: var(--text);
-            line-height: 1.5;
-            min-height: 100vh;
-            min-height: 100dvh;
-            padding-bottom: 90px;
-        }
-        @media (max-width: 420px) {
-            body { padding-bottom: 70px; }
-        }
-
-        .offline-banner {
-            position: fixed;
-            top: 0; left: 0; right: 0;
-            z-index: 1000;
-            background: var(--red);
-            color: white;
-            text-align: center;
-            padding: 8px 16px;
-            font-size: 13px;
-            font-weight: 600;
-            transform: translateY(-100%);
-            transition: transform var(--transition);
-        }
+        body { font-family: var(--font); background: var(--indigo-bg); color: var(--text); padding-bottom: 90px; min-height: 100vh; }
+        .offline-banner { position: fixed; top: 0; left: 0; right: 0; z-index: 1000; background: var(--red); color: white; text-align: center; padding: 8px; font-size: 13px; font-weight: 600; transform: translateY(-100%); transition: transform var(--transition); }
         .offline-banner.show { transform: translateY(0); }
-
-        .sync-status {
-            position: fixed;
-            bottom: 90px;
-            right: 20px;
-            background: var(--surface);
-            border: 1px solid var(--border);
-            border-radius: 20px;
-            padding: 6px 14px;
-            font-size: 11px;
-            font-weight: 600;
-            color: var(--text-muted);
-            box-shadow: var(--shadow-sm);
-            z-index: 40;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            transition: all var(--transition);
-        }
+        .sync-status { position: fixed; bottom: 90px; right: 20px; background: var(--surface); border: 1px solid var(--border); border-radius: 20px; padding: 6px 14px; font-size: 11px; font-weight: 600; color: var(--text-muted); box-shadow: var(--shadow-sm); z-index: 40; display: flex; align-items: center; gap: 6px; }
         .sync-status.synced { color: var(--green); border-color: var(--green); }
         .sync-status.syncing { color: var(--amber); border-color: var(--amber); }
         .sync-status.error { color: var(--red); border-color: var(--red); }
-
-        .header {
-            background: linear-gradient(135deg, var(--indigo) 0%, var(--indigo-dark) 100%);
-            color: white;
-            padding: 48px 20px 32px;
-            position: relative;
-            overflow: hidden;
-        }
-        .header::before {
-            content: '';
-            position: absolute;
-            inset: 0;
-            background: radial-gradient(circle at 85% 30%, rgba(255,255,255,0.07) 0%, transparent 50%);
-        }
-
-        .header-inner {
-            position: relative;
-            z-index: 1;
-            max-width: var(--max-width);
-            margin: 0 auto;
-        }
-
-        .header-top {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 24px;
-        }
-
-        .header-brand {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .header-brand .logo {
-            width: 40px;
-            height: 40px;
-            background: rgba(255,255,255,0.15);
-            border-radius: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 20px;
-            font-weight: 800;
-            border: 1.5px solid rgba(255,255,255,0.25);
-        }
-
-        .header-brand h1 {
-            font-size: 20px;
-            font-weight: 700;
-        }
-
-        .month-selector {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            background: rgba(255,255,255,0.1);
-            padding: 6px 12px;
-            border-radius: var(--radius-sm);
-            backdrop-filter: blur(4px);
-            border: 1px solid rgba(255,255,255,0.15);
-        }
-
-        .month-selector button {
-            background: none;
-            border: none;
-            color: white;
-            font-size: 18px;
-            cursor: pointer;
-            width: 28px;
-            height: 28px;
-            border-radius: 6px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: background var(--transition);
-        }
-        .month-selector button:hover { background: rgba(255,255,255,0.15); }
-        .month-selector span {
-            font-size: 14px;
-            font-weight: 600;
-            min-width: 90px;
-            text-align: center;
-        }
-
-        .total-section {
-            text-align: center;
-        }
-        .total-section .label {
-            font-size: 13px;
-            opacity: 0.75;
-            font-weight: 500;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-        }
-        .total-section .amount {
-            font-size: clamp(32px, 6vw, 44px);
-            font-weight: 800;
-            letter-spacing: -0.02em;
-            margin-top: 2px;
-        }
-        .total-section .amount small {
-            font-size: 18px;
-            font-weight: 600;
-            opacity: 0.7;
-        }
-
-        .main {
-            max-width: var(--max-width);
-            margin: 0 auto;
-            padding: 20px 16px 0;
-        }
-
-        .fab {
-            position: fixed;
-            bottom: 24px;
-            right: 24px;
-            width: 56px;
-            height: 56px;
-            border-radius: 50%;
-            background: var(--indigo);
-            color: white;
-            border: none;
-            font-size: 28px;
-            font-weight: 300;
-            cursor: pointer;
-            box-shadow: 0 4px 20px rgba(79,70,229,0.4);
-            transition: all var(--transition);
-            z-index: 50;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        .fab:hover {
-            transform: scale(1.08);
-            box-shadow: 0 6px 28px rgba(79,70,229,0.5);
-        }
-        .fab:active {
-            transform: scale(0.95);
-        }
-
-        .category-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 10px;
-            margin-bottom: 20px;
-        }
-        @media (max-width: 420px) {
-            .category-grid { gap: 8px; margin-bottom: 16px; }
-        }
-
-        .cat-card {
-            background: var(--surface);
-            border-radius: var(--radius-sm);
-            padding: 14px;
-            border: 1px solid var(--border);
-            cursor: pointer;
-            transition: all var(--transition);
-            position: relative;
-            overflow: hidden;
-        }
-        .cat-card:hover {
-            border-color: var(--indigo-light);
-            box-shadow: var(--shadow);
-            transform: translateY(-1px);
-        }
-        .cat-card:active {
-            transform: scale(0.97);
-        }
-
-        .cat-card .cat-top {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            margin-bottom: 8px;
-        }
-
-        .cat-card .cat-icon {
-            width: 36px;
-            height: 36px;
-            border-radius: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 18px;
-            flex-shrink: 0;
-        }
-
-        .cat-card .cat-name {
-            font-size: 13px;
-            font-weight: 600;
-            color: var(--text);
-            flex: 1;
-        }
-
-        .cat-card .cat-total {
-            font-size: 15px;
-            font-weight: 700;
-            color: var(--text);
-        }
-
-        .cat-card .cat-bar {
-            height: 3px;
-            border-radius: 2px;
-            margin-top: 6px;
-            background: var(--border);
-            overflow: hidden;
-        }
-        .cat-card .cat-bar-fill {
-            height: 100%;
-            border-radius: 2px;
-            transition: width 0.6s ease;
-        }
-
-        .cat-card .cat-count {
-            font-size: 11px;
-            color: var(--text-muted);
-            margin-top: 4px;
-        }
-
-        .cat-bil { --cat-color: var(--red); --cat-bg: var(--red-bg); }
-        .cat-pendidikan { --cat-color: var(--blue); --cat-bg: var(--blue-bg); }
-        .cat-petrol { --cat-color: var(--amber); --cat-bg: var(--amber-bg); }
-        .cat-dapur { --cat-color: var(--green); --cat-bg: var(--green-bg); }
-        .cat-pinjaman { --cat-color: var(--purple); --cat-bg: var(--purple-bg); }
-        .cat-lain { --cat-color: var(--pink); --cat-bg: var(--pink-bg); }
-
-        .cat-card .cat-icon { background: var(--cat-bg); color: var(--cat-color); }
-        .cat-card .cat-bar-fill { background: var(--cat-color); }
-
-        .entries-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 12px;
-        }
-        .entries-header h2 { font-size: 16px; font-weight: 700; }
-        .entries-header .entry-count { font-size: 13px; color: var(--text-secondary); }
-        @media (max-width: 420px) {
-            .entries-header { margin-bottom: 10px; }
-        }
-
-        .entry-list {
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-        }
-        @media (max-width: 420px) {
-            .entry-list { gap: 6px; }
-        }
-
-        .entry-empty {
-            text-align: center;
-            padding: 40px 20px;
-            color: var(--text-muted);
-            background: var(--surface);
-            border-radius: var(--radius);
-            border: 1px dashed var(--border);
-        }
-        .entry-empty .emoji { font-size: 40px; margin-bottom: 12px; display: block; }
-        .entry-empty p { font-size: 14px; }
-        @media (max-width: 420px) {
-            .entry-empty { padding: 24px 16px; }\n            .entry-empty .emoji { font-size: 32px; margin-bottom: 8px; }\n            .entry-empty p { font-size: 13px; }\n        }
-
-        .entry-item {
-            background: var(--surface);
-            border-radius: var(--radius-sm);
-            padding: 12px 14px;
-            border: 1px solid var(--border);
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            transition: all var(--transition);
-            animation: slideUp 0.3s ease;
-        }
-        .entry-item:hover { border-color: var(--indigo-light); }
-
-        .entry-item .e-icon {
-            width: 38px; height: 38px;
-            border-radius: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 16px;
-            flex-shrink: 0;
-        }
-
-        .entry-item .e-info { flex: 1; min-width: 0; }
-        .entry-item .e-info .e-cat { font-size: 13px; font-weight: 600; color: var(--text); }
-        .entry-item .e-info .e-note { font-size: 12px; color: var(--text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .entry-item .e-info .e-date { font-size: 11px; color: var(--text-muted); }
-        .entry-item .e-amount { font-size: 15px; font-weight: 700; color: var(--text); white-space: nowrap; }
-
-        .entry-item .e-delete {
-            background: none; border: none; color: var(--text-muted); font-size: 16px; cursor: pointer; padding: 4px; border-radius: 6px; transition: all var(--transition); opacity: 0;
-        }
-        .entry-item:hover .e-delete { opacity: 1; }
-        .entry-item .e-delete:hover { background: var(--red-bg); color: var(--red); }
-
-        .modal-overlay {
-            position: fixed;
-            inset: 0;
-            background: rgba(0,0,0,0.4);
-            backdrop-filter: blur(4px);
-            z-index: 100;
-            display: none;
-            align-items: flex-end;
-            justify-content: center;
-        }
-        @media (min-width: 500px) { .modal-overlay { align-items: center; } }
+        .header { background: linear-gradient(135deg, var(--indigo) 0%, var(--indigo-dark) 100%); color: white; padding: 40px 20px 32px; text-align: center; }
+        .header-inner { max-width: var(--max-width); margin: 0 auto; }
+        .header-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .header-brand h1 { font-size: 20px; font-weight: 700; }
+        .month-selector { display: flex; align-items: center; gap: 8px; background: rgba(255,255,255,0.15); padding: 6px 12px; border-radius: var(--radius-sm); }
+        .month-selector button { background: none; border: none; color: white; font-size: 18px; cursor: pointer; width: 28px; }
+        .month-selector span { font-size: 14px; font-weight: 600; min-width: 90px; }
+        .total-section { margin-top: 10px; }
+        .total-section .amount { font-size: 36px; font-weight: 800; }
+        .main { max-width: var(--max-width); margin: 0 auto; padding: 20px 16px; }
+        
+        .category-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px; }
+        @media (max-width: 480px) { .category-grid { grid-template-columns: 1fr; } }
+        .cat-card { background: var(--surface); border-radius: var(--radius-sm); padding: 14px; border: 1px solid var(--border); }
+        .cat-card .cat-top { display: flex; justify-content: space-between; align-items: center; }
+        .cat-card .cat-name { font-size: 13px; font-weight: 600; }
+        .cat-card .cat-total { font-size: 15px; font-weight: 700; }
+        .cat-card .cat-bar { height: 4px; background: var(--border); border-radius: 2px; margin-top: 8px; overflow: hidden; }
+        .cat-card .cat-bar-fill { height: 100%; width: 0%; transition: width 0.5s ease; }
+        
+        .entry-list { display: flex; flex-direction: column; gap: 8px; margin-top: 12px; }
+        .entry-item { background: var(--surface); border-radius: var(--radius-sm); padding: 12px; border: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
+        .entry-item .e-info { display: flex; flex-direction: column; }
+        .entry-item .e-cat { font-size: 13px; font-weight: 600; }
+        .entry-item .e-note { font-size: 12px; color: var(--text-secondary); }
+        .entry-item .e-date { font-size: 11px; color: var(--text-muted); }
+        .entry-item .e-right { display: flex; align-items: center; gap: 12px; }
+        .entry-item .e-amount { font-size: 14px; font-weight: 700; }
+        .entry-item .e-delete { background: none; border: none; color: var(--red); cursor: pointer; font-size: 14px; padding: 4px; }
+        .entry-empty { text-align: center; padding: 40px; color: var(--text-muted); background: var(--surface); border-radius: var(--radius); border: 1px dashed var(--border); }
+        
+        .fab { position: fixed; bottom: 24px; right: 24px; width: 56px; height: 56px; border-radius: 50%; background: var(--indigo); color: white; border: none; font-size: 28px; cursor: pointer; box-shadow: 0 4px 20px rgba(79,70,229,0.4); z-index: 50; display: flex; align-items: center; justify-content: center; }
+        .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.4); backdrop-filter: blur(4px); z-index: 100; display: none; align-items: center; justify-content: center; padding: 20px; }
         .modal-overlay.open { display: flex; }
-
-        .modal {
-            background: var(--surface);
-            border-radius: var(--radius) var(--radius) 0 0;
-            width: 100%;
-            max-width: 460px;
-            max-height: 85vh;
-            overflow-y: auto;
-            padding: 24px 20px 32px;
-            animation: modalUp 0.3s ease;
-        }
-        @media (min-width: 500px) { .modal { border-radius: var(--radius); max-height: 90vh; } }
-        @media (max-width: 420px) { .modal { padding: 16px 16px 24px; } .modal h2 { font-size: 16px; margin-bottom: 16px; } }
-
-        @keyframes modalUp { from { transform: translateY(40px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
-        @keyframes slideUp { from { transform: translateY(8px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
-
-        .modal-handle {
-            width: 36px; height: 4px; background: var(--border); border-radius: 2px; margin: 0 auto 20px;
-        }
-        @media (min-width: 500px) { .modal-handle { display: none; } }
-
-        .modal h2 { font-size: 18px; font-weight: 700; margin-bottom: 20px; }
-
-        .form-group { margin-bottom: 16px; }
-        .form-group label { display: block; font-size: 13px; font-weight: 600; color: var(--text-secondary); margin-bottom: 6px; }
-
-        .form-group select,
-        .form-group input,
-        .form-group textarea {
-            width: 100%;
-            padding: 10px 14px;
-            border: 1.5px solid var(--border);
-            border-radius: var(--radius-xs);
-            font-family: var(--font);
-            font-size: 14px;
-            color: var(--text);
-            background: var(--surface-alt);
-            transition: border-color var(--transition);
-            outline: none;
-        }
-        .form-group select:focus,
-        .form-group input:focus,
-        .form-group textarea:focus { border-color: var(--indigo-light); }
-        .form-group textarea { resize: vertical; min-height: 60px; }
-        @media (max-width: 420px) {
-            .form-group { margin-bottom: 12px; }
-            .form-group label { font-size: 12px; margin-bottom: 4px; }
-            .form-group select,
-            .form-group input,
-            .form-group textarea { padding: 8px 12px; font-size: 13px; }
-            .form-group textarea { min-height: 50px; }
-        }
-
-        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-
-        .modal-actions { display: flex; gap: 10px; margin-top: 20px; }
-        .modal-actions button {
-            flex: 1; padding: 12px; border: none; border-radius: var(--radius-xs);
-            font-family: var(--font); font-size: 14px; font-weight: 600; cursor: pointer; transition: all var(--transition);
-        }
-        .modal-actions .btn-cancel { background: var(--surface-alt); color: var(--text-secondary); border: 1px solid var(--border); }
-        .modal-actions .btn-cancel:hover { background: var(--border); }
+        .modal { background: var(--surface); border-radius: var(--radius); width: 100%; max-width: 420px; padding: 24px; }
+        
+        .form-group { margin-bottom: 14px; }
+        .form-group label { display: block; font-size: 12px; font-weight: 600; margin-bottom: 4px; color: var(--text-secondary); }
+        .form-group select, .form-group input, .form-group textarea { width: 100%; padding: 10px; border: 1.5px solid var(--border); border-radius: var(--radius-xs); background: var(--surface-alt); color: var(--text); outline: none; font-size: 14px; }
+        .modal-actions { display: flex; gap: 10px; margin-top: 18px; }
+        .modal-actions button { flex: 1; padding: 10px; border: none; border-radius: var(--radius-xs); font-size: 14px; font-weight: 600; cursor: pointer; }
+        .modal-actions .btn-cancel { background: var(--surface-alt); border: 1px solid var(--border); color: var(--text-secondary); }
         .modal-actions .btn-save { background: var(--indigo); color: white; }
-        .modal-actions .btn-save:hover { background: var(--indigo-dark); }
-        @media (max-width: 420px) {
-            .modal-actions { gap: 8px; margin-top: 16px; }
-            .modal-actions button { padding: 10px; font-size: 13px; }
-        }
-
-        .section-actions {
-            display: flex;
-            justify-content: flex-end;
-            margin-bottom: 12px;
-            gap: 8px;
-            flex-wrap: wrap;
-        }
-        .btn-sm {
-            padding: 6px 14px;
-            border-radius: var(--radius-xs);
-            font-size: 12px;
-            font-weight: 600;
-            border: 1px solid var(--border);
-            background: var(--surface);
-            color: var(--text-secondary);
-            cursor: pointer;
-            transition: all var(--transition);
-            font-family: var(--font);
-            white-space: nowrap;
-        }
-        .btn-sm:hover { border-color: var(--indigo-light); color: var(--indigo); }
-        .btn-sm.danger { color: var(--red); }
-        .btn-sm.danger:hover { background: var(--red-bg); border-color: var(--red); }
-        .btn-sm.success { color: var(--green); }
-        .btn-sm.success:hover { background: var(--green-bg); border-color: var(--green); }
-        .btn-sm.info { color: var(--blue); }
-        .btn-sm.info:hover { background: var(--blue-bg); border-color: var(--blue); }
-        .btn-sm.install { color: var(--indigo); display: none; }
-        .btn-sm.install.show { display: inline-flex; align-items: center; gap: 6px; }
-        .btn-sm.install:hover { background: var(--indigo-bg); border-color: var(--indigo); }
-
-        .user-chip {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            background: rgba(255,255,255,0.12);
-            color: white;
-            border: 1px solid rgba(255,255,255,0.2);
-            border-radius: var(--radius-sm);
-            padding: 7px 12px;
-            font-family: var(--font);
-            font-size: 12px;
-            font-weight: 700;
-            cursor: pointer;
-            transition: background var(--transition);
-            max-width: 200px;
-        }
-        .user-chip:hover { background: rgba(255,255,255,0.18); }
-        .user-chip-avatar {
-            width: 28px;
-            height: 28px;
-            border-radius: 50%;
-            background: rgba(255,255,255,0.25);
-            border: 1.5px solid rgba(255,255,255,0.4);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 12px;
-            font-weight: 800;
-            flex-shrink: 0;
-            color: white;
-            overflow: hidden;
-        }
-        .user-chip-avatar img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-        .user-chip span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-
-        .auth-note {
-            background: var(--blue-bg);
-            border: 1px solid rgba(59,130,246,0.28);
-            color: var(--text-secondary);
-            border-radius: var(--radius-sm);
-            padding: 12px 14px;
-            font-size: 13px;
-            margin-bottom: 16px;
-        }
-        .auth-note strong { color: var(--blue); }
-
-        .footer {
-            text-align: center;
-            padding: 16px;
-            font-size: 12px;
-            color: var(--text-muted);
-            margin-top: 20px;
-        }
-        @media (max-width: 420px) {
-            .footer { padding: 12px; font-size: 11px; margin-top: 12px; }
-        }
-
-        @media (max-width: 420px) {
-            .header { padding: 20px 14px 24px; }
-            .header-top { 
-                display: flex;
-                flex-direction: row;
-                justify-content: space-between;
-                align-items: center;
-                gap: 10px;
-                margin-bottom: 0;
-            }
-            .header-brand { 
-                flex-direction: row; 
-                gap: 0; 
-                align-items: center;
-                width: auto;
-            }
-            .header-brand .logo { display: none; }
-            .header-brand h1 { font-size: 18px; font-weight: 800; letter-spacing: -0.3px; margin: 0; }
-            .user-chip { 
-                position: relative;
-                top: auto;
-                right: auto;
-                font-size: 11px; 
-                padding: 6px 10px; 
-                gap: 6px; 
-                max-width: 140px; 
-                background: rgba(255,255,255,0.2);
-                border: 1.5px solid rgba(255,255,255,0.3);
-                border-radius: 20px;
-                z-index: 100;
-                flex-shrink: 0;
-            }
-            .user-chip-avatar { width: 24px; height: 24px; font-size: 11px; font-weight: 900; border-width: 1.5px; }
-            .month-selector { 
-                width: 100%; 
-                justify-content: center;
-                font-size: 12px; 
-                padding: 10px 0 0 0; 
-                gap: 10px;
-                margin-top: 12px;
-                flex-basis: 100%;
-                order: 10;
-            }
-            .month-selector button { font-size: 16px; width: 28px; height: 28px; }
-            .month-selector span { font-size: 12px; min-width: 90px; }
-            .total-section { margin-top: 12px; padding-top: 12px; border-top: 1px solid rgba(255,255,255,0.15); }
-            .total-section .amount { font-size: clamp(24px, 6vw, 36px); margin-top: 6px; letter-spacing: -0.8px; }
-            .total-section .label { font-size: 11px; opacity: 0.85; letter-spacing: 0.8px; }
-            .category-grid { grid-template-columns: 1fr; }
-            .fab { width: 48px; height: 48px; font-size: 22px; bottom: 16px; right: 16px; }
-            .section-actions { justify-content: center; gap: 6px; flex-wrap: wrap; }
-            .btn-sm { padding: 5px 12px; font-size: 11px; }
-            .entry-item { padding: 10px 12px; gap: 10px; }
-            .entry-item .e-icon { width: 32px; height: 32px; font-size: 14px; }
-            .entry-item .e-info .e-cat { font-size: 12px; }
-            .entry-item .e-info .e-note { font-size: 11px; }
-            .entry-item .e-info .e-date { font-size: 10px; }
-            .entry-item .e-amount { font-size: 13px; }
-            .main { padding: 16px 12px 0; }
-            .entries-header h2 { font-size: 14px; }
-            .entries-header .entry-count { font-size: 12px; }
-            .cat-card { padding: 12px; }
-            .cat-card .cat-name { font-size: 12px; }
-            .cat-card .cat-total { font-size: 14px; }
-            .cat-card .cat-count { font-size: 10px; }
-        }
-
-        @media (min-width: 421px) and (max-width: 640px) {
-            .header { padding: 44px 20px 28px; }
-        }
-
-        @media (min-width: 641px) {
-            .main { padding: 24px 24px 0; }
-            .category-grid { gap: 12px; }
-            .cat-card { padding: 18px; }
-            .entry-item { padding: 14px 16px; }
-        }
-
-        @media all and (display-mode: standalone) {
-            .header { padding-top: 36px; }
-        }
-
-        #importFileInput { display: none; }
-
-        .toast {
-            position: fixed;
-            bottom: 90px;
-            left: 50%;
-            transform: translateX(-50%) translateY(20px);
-            background: var(--surface);
-            border: 1px solid var(--border);
-            border-radius: var(--radius-sm);
-            padding: 10px 20px;
-            box-shadow: var(--shadow-lg);
-            font-size: 13px;
-            font-weight: 600;
-            z-index: 200;
-            opacity: 0;
-            transition: all 0.3s ease;
-            pointer-events: none;
-            text-align: center;
-        }
-        .toast.show {
-            opacity: 1;
-            transform: translateX(-50%) translateY(0);
-        }
+        .user-chip { display: inline-flex; align-items: center; gap: 6px; background: rgba(255,255,255,0.15); color: white; border: 1px solid rgba(255,255,255,0.2); border-radius: 20px; padding: 6px 12px; font-size: 12px; font-weight: 600; cursor: pointer; }
+        
+        .chart-section { background: var(--surface); border-radius: var(--radius-sm); border: 1px solid var(--border); padding: 16px; margin-bottom: 20px; }
+        .chart-container { position: relative; height: 220px; width: 100%; }
+        
+        .section-actions { display: flex; justify-content: space-between; gap: 8px; margin-top: 12px; }
+        .btn-sm { padding: 8px 12px; font-size: 12px; border-radius: var(--radius-xs); border: 1px solid var(--border); background: var(--surface); color: var(--text-secondary); cursor: pointer; }
+        .toast { position: fixed; bottom: 90px; left: 50%; transform: translateX(-50%) translateY(20px); background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 10px 20px; box-shadow: var(--shadow-lg); font-size: 13px; font-weight: 600; z-index: 200; opacity: 0; transition: all 0.3s ease; }
+        .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
         .toast.success { border-color: var(--green); color: var(--green); }
         .toast.error { border-color: var(--red); color: var(--red); }
-
-        .chart-section {
-            background: var(--surface);
-            border-radius: var(--radius-sm);
-            border: 1px solid var(--border);
-            padding: 20px;
-            margin-bottom: 20px;
-            box-shadow: var(--shadow-sm);
-        }
-        .chart-section h3 {
-            font-size: 14px;
-            font-weight: 700;
-            color: var(--text);
-            margin-bottom: 16px;
-            text-align: center;
-        }
-        .chart-container {
-            position: relative;
-            height: 280px;
-            width: 100%;
-        }
-        @media (max-width: 768px) {
-            .chart-section { padding: 14px; margin-bottom: 14px; }
-            .chart-section h3 { font-size: 13px; margin-bottom: 12px; }
-            .chart-container { height: 200px; }
-        }
-        @media (max-width: 420px) {
-            .chart-section { padding: 12px; margin-bottom: 12px; }
-            .chart-section h3 { font-size: 12px; margin-bottom: 10px; }
-            .chart-container { height: 160px; }
-        }
     </style>
 </head>
 <body>
@@ -759,73 +103,58 @@
     <header class="header">
         <div class="header-inner">
             <div class="header-top">
-                <div class="header-brand">
-                    <div class="logo">E</div>
-                    <h1>MyExpense</h1>
-                </div>
-                <button class="user-chip" id="userBtn" type="button" aria-label="Tukar pengguna">
-                    <div class="user-chip-avatar" id="userAvatar">👤</div>
-                    <span id="userLabel">Login</span>
+                <div class="header-brand"><h1>MyExpense</h1></div>
+                <button class="user-chip" id="userBtn">
+                    <span id="userAvatar">👤</span> <span id="userLabel">Login</span>
                 </button>
-                <div class="month-selector">
-                    <button id="prevMonth" aria-label="Bulan sebelumnya">‹</button>
-                    <span id="monthLabel">Jun 2026</span>
-                    <button id="nextMonth" aria-label="Bulan seterusnya">›</button>
-                </div>
+            </div>
+            <div class="month-selector">
+                <button id="prevMonth">‹</button>
+                <span id="monthLabel">--</span>
+                <button id="nextMonth">›</button>
             </div>
             <div class="total-section">
-                <div class="label">Jumlah Perbelanjaan</div>
-                <div class="amount" id="grandTotal">RM 0<small>.00</small></div>
+                <div class="amount" id="grandTotal">RM 0.00</div>
             </div>
         </div>
     </header>
 
-    <main class="main" id="app">
-        <div class="chart-section" id="monthlyChartSection" style="display: none;">
-            <h3>📈 Perbelanjaan Bulanan (6 Bulan Terakhir)</h3>
-            <div class="chart-container">
-                <canvas id="monthlyChart"></canvas>
-            </div>
+    <main class="main">
+        <!-- CARTA 1: Pecahan Kategori Bulan Dipilih (Doughnut - BERWARNA-WARNI & INTERAKTIF) -->
+        <div class="chart-section" id="chartSection" style="display:none;">
+            <h4 style="margin-bottom:12px; font-size:13px; color:var(--text-secondary);">📊 Pecahan Belanja Bulan Ini</h4>
+            <div class="chart-container"><canvas id="expenseChart"></canvas></div>
         </div>
-        <div class="chart-section" id="chartSection" style="display: none;">
-            <h3>📊 Pecahan Perbelanjaan</h3>
-            <div class="chart-container">
-                <canvas id="expenseChart"></canvas>
-            </div>
+
+        <!-- CARTA 2: Perbandingan Antara Bulan (Bar Chart) -->
+        <div class="chart-section" id="compareChartSection" style="display:none;">
+            <h4 style="margin-bottom:12px; font-size:13px; color:var(--text-secondary);">📈 Trend Perbandingan Bulanan</h4>
+            <div class="chart-container" style="height:200px;"><canvas id="compareChart"></canvas></div>
         </div>
+
         <div class="category-grid" id="categoryGrid"></div>
 
-        <div class="entries-header">
-            <h2>📋 Transaksi Terkini</h2>
-            <span class="entry-count" id="entryCount">0 rekod</span>
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-top:20px;">
+            <h3>📋 Transaksi Bulan Ini</h3>
+            <span id="entryCount" style="font-size:13px; color:var(--text-secondary);">0 rekod</span>
         </div>
+
+        <div class="entry-list" id="entryList"></div>
 
         <div class="section-actions">
-            <button class="btn-sm install" id="installBtn">Install App</button>
-            <button class="btn-sm danger" id="resetBtn">✕ Reset Bulan Ini</button>
-            <button class="btn-sm info" id="exportBtn">📥 Eksport</button>
-            <button class="btn-sm success" id="importBtn">📤 Import</button>
+            <button class="btn-sm" id="forceSyncBtn" style="background:var(--indigo); color:white; font-weight:600; border:none;">🔄 Tarik Semua Data Supabase</button>
+            <button class="btn-sm" id="resetBtn" style="color:var(--red);">Reset Bulan Ini</button>
         </div>
-        <input type="file" id="importFileInput" accept=".json">
-
-        <div class="entry-list" id="entryList">
-            <div class="entry-empty">
-                <span class="emoji">📭</span>
-                <p>Tiada rekod untuk bulan ini.<br>Tekan + untuk tambah perbelanjaan.</p>
-            </div>
-        </div>
-
-        <div class="footer">© 2026 <strong>MyExpense</strong> — Data sync ke awan</div>
     </main>
 
-    <button class="fab" id="fabBtn" aria-label="Tambah perbelanjaan">+</button>
+    <button class="fab" id="fabBtn">+</button>
 
+    <!-- Modal Tambah Transaksi -->
     <div class="modal-overlay" id="modalOverlay">
         <div class="modal">
-            <div class="modal-handle"></div>
-            <h2 id="modalTitle">Tambah Perbelanjaan</h2>
-            <div class="form-group">
-                <label for="catSelect">Kategori</label>
+            <h2>Tambah Perbelanjaan</h2>
+            <div class="form-group" style="margin-top:15px;">
+                <label>Kategori</label>
                 <select id="catSelect">
                     <option value="bil">Bil & Utiliti</option>
                     <option value="pendidikan">Yuran Pendidikan</option>
@@ -835,19 +164,17 @@
                     <option value="lain">Lain-lain</option>
                 </select>
             </div>
-            <div class="form-row">
-                <div class="form-group">
-                    <label for="amountInput">Jumlah (RM)</label>
-                    <input type="number" id="amountInput" min="0.01" step="0.01" placeholder="0.00" required>
-                </div>
-                <div class="form-group">
-                    <label for="dateInput">Tarikh</label>
-                    <input type="date" id="dateInput" required>
-                </div>
+            <div class="form-group">
+                <label>Jumlah (RM)</label>
+                <input type="number" id="amountInput" step="0.01" placeholder="0.00" required>
             </div>
             <div class="form-group">
-                <label for="noteInput">Catatan (optional)</label>
-                <textarea id="noteInput" placeholder="Contoh: Bil elektrik bulan Jun" rows="2"></textarea>
+                <label>Tarikh</label>
+                <input type="date" id="dateInput" required>
+            </div>
+            <div class="form-group">
+                <label>Catatan (opsional)</label>
+                <input type="text" id="noteInput" placeholder="Contoh: Bil elektrik">
             </div>
             <div class="modal-actions">
                 <button class="btn-cancel" id="cancelBtn">Batal</button>
@@ -856,873 +183,412 @@
         </div>
     </div>
 
+    <!-- Modal Login -->
     <div class="modal-overlay" id="authOverlay">
         <div class="modal">
-            <div class="modal-handle"></div>
             <h2>Login Pengguna</h2>
-            <div class="auth-note">
-                <strong>Guna nama dan PIN yang sama</strong> pada semua telefon/browser supaya Supabase sync data pengguna yang betul.
+            <div class="form-group" style="margin-top:15px;">
+                <label>Nama Pengguna</label>
+                <input type="text" id="loginNameInput" placeholder="Contoh: ashraf">
             </div>
             <div class="form-group">
-                <label for="loginNameInput">Nama pengguna</label>
-                <input type="text" id="loginNameInput" autocomplete="username" placeholder="Contoh: keluarga ali">
-            </div>
-            <div class="form-group">
-                <label for="loginPinInput">PIN sync</label>
-                <input type="password" id="loginPinInput" inputmode="numeric" autocomplete="current-password" placeholder="Contoh: 1234">
+                <label>PIN (4 Digit)</label>
+                <input type="password" id="loginPinInput" maxlength="4" placeholder="0000">
             </div>
             <div class="modal-actions">
-                <button class="btn-cancel" id="logoutBtn">Logout</button>
-                <button class="btn-save" id="loginBtn">Login & Sync</button>
+                <button class="btn-cancel" id="authCancelBtn">Batal</button>
+                <button class="btn-save" id="authSaveBtn">Masuk</button>
             </div>
         </div>
     </div>
 
     <script>
-        // ===================== SUPABASE REST API =====================
-        const SUPABASE_URL = 'https://tgctymbcdhvnyvncryqx.supabase.co';
-        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRnY3R5bWJjZGh2bnl2bmNyeXF4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODI1NjMyMTIsImV4cCI6MjA5ODEzOTIxMn0.5X615_6NgGpHP5Jr849ZeVBWPamABB5YxMoiqkjkTm4';
-        const SB = (path, options = {}) => {
-            const url = `${SUPABASE_URL}/rest/v1/${path}`;
-            const headers = {
-                'apikey': SUPABASE_ANON_KEY,
-                'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
-                'Content-Type': 'application/json',
-                ...options.headers
-            };
-            return fetch(url, { ...options, headers }).then(r => {
-                if (!r.ok) return r.text().then(t => { throw new Error(`${r.status}: ${t}`); });
-                return r;
-            });
+        const SUPABASE_URL = "https://tgctymbcdhvnyvncryqx.supabase.co";
+        const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRnY3R5bWJjZGh2bnl2bmNyeXF4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODI1NjMyMTIsImV4cCI6MjA5ODEzOTIxMn0.5X615_6NgGpHP5Jr849ZeVBWPamABB5YxMoiqkjkTm4";
+        
+        let supabaseClient = null;
+        try {
+            if (typeof supabase !== 'undefined') {
+                supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+            }
+        } catch(err) { console.error(err); }
+
+        // Definisi Kategori dan Kod Warna Khusus
+        const CATEGORIES = {
+            bil: { name: 'Bil & Utiliti', color: '#ef4444' },     // Merah
+            pendidikan: { name: 'Yuran Pendidikan', color: '#3b82f6' }, // Biru
+            petrol: { name: 'Petrol', color: '#f59e0b' },         // Kuning/Amber
+            dapur: { name: 'Belanja Dapur', color: '#10b981' },     // Hijau
+            pinjaman: { name: 'Pinjaman', color: '#8b5cf6' },     // Ungu
+            lain: { name: 'Lain-lain', color: '#ec4899' }         // Pink
         };
 
-        // ===================== DEVICE ID =====================
-        function getDeviceId() {
-            let id = localStorage.getItem('myexpense_device_id');
-            if (!id) {
-                id = 'dev_' + Date.now().toString(36) + '_' + Math.random().toString(36).slice(2, 8);
-                localStorage.setItem('myexpense_device_id', id);
-            }
-            return id;
-        }
-        const DEVICE_ID = getDeviceId();
-
-        function normalizeLoginPart(value) {
-            return (value || '').trim().toLowerCase().replace(/\s+/g, '-');
-        }
-
-        function makeUserKey(name, pin) {
-            const safeName = normalizeLoginPart(name);
-            const safePin = normalizeLoginPart(pin);
-            return safeName && safePin ? `user_${safeName}_${safePin}` : '';
-        }
-
-        function loadCurrentUser() {
-            try {
-                return JSON.parse(localStorage.getItem('myexpense_current_user')) || null;
-            } catch {
-                return null;
-            }
-        }
-
-        function saveCurrentUser(user) {
-            if (user) localStorage.setItem('myexpense_current_user', JSON.stringify(user));
-            else localStorage.removeItem('myexpense_current_user');
-        }
-
-        let currentUser = loadCurrentUser();
-
-        function getSyncUserKey() {
-            return currentUser?.key || '';
-        }
-
-        // ===================== CONFIG =====================
-        const CATEGORIES = [
-            { id: 'bil',        label: 'Bil & Utiliti',     emoji: '💡', color: 'cat-bil' },
-            { id: 'pendidikan', label: 'Yuran Pendidikan', emoji: '📚', color: 'cat-pendidikan' },
-            { id: 'petrol',     label: 'Petrol',           emoji: '⛽', color: 'cat-petrol' },
-            { id: 'dapur',      label: 'Belanja Dapur',    emoji: '🛒', color: 'cat-dapur' },
-            { id: 'pinjaman',   label: 'Pinjaman',         emoji: '🏦', color: 'cat-pinjaman' },
-            { id: 'lain',       label: 'Lain-lain',        emoji: '📌', color: 'cat-lain' },
-        ];
-
-        const MONTHS = ['Januari','Februari','Mac','April','Mei','Jun','Julai','Ogos','September','Oktober','November','Disember'];
-
+        let expenses = JSON.parse(localStorage.getItem('myexpense_data')) || [];
         let currentDate = new Date();
-        let currentMonth = currentDate.getMonth();
-        let currentYear = currentDate.getFullYear();
-        let entries = [];
-        let deletedEntryIds = [];
-        let isSyncing = false;
+        let myChart = null;
+        let compareChart = null;
 
-        const $ = id => document.getElementById(id);
-        const monthLabel   = $('monthLabel');
-        const prevMonth    = $('prevMonth');
-        const nextMonth    = $('nextMonth');
-        const grandTotal   = $('grandTotal');
-        const categoryGrid = $('categoryGrid');
-        const entryList    = $('entryList');
-        const entryCount   = $('entryCount');
-        const modalOverlay = $('modalOverlay');
-        const fabBtn       = $('fabBtn');
-        const cancelBtn    = $('cancelBtn');
-        const saveBtn      = $('saveBtn');
-        const catSelect    = $('catSelect');
-        const amountInput  = $('amountInput');
-        const dateInput    = $('dateInput');
-        const noteInput    = $('noteInput');
-        const resetBtn     = $('resetBtn');
-        const offlineBanner = $('offlineBanner');
-        const syncStatus   = $('syncStatus');
-        const exportBtn    = $('exportBtn');
-        const importBtn    = $('importBtn');
-        const installBtn   = $('installBtn');
-        const importFileInput = $('importFileInput');
-        const userBtn      = $('userBtn');
-        const userLabel    = $('userLabel');
-        const authOverlay  = $('authOverlay');
-        const loginNameInput = $('loginNameInput');
-        const loginPinInput = $('loginPinInput');
-        const loginBtn     = $('loginBtn');
-        const logoutBtn    = $('logoutBtn');
-        const toast               = $('toast');
-        const chartSection        = $('chartSection');
-        const chartCanvas         = $('expenseChart');
-        const monthlyChartSection = $('monthlyChartSection');
-        const monthlyChartCanvas  = $('monthlyChart');
-        let toastTimer            = null;
-        let deferredInstallPrompt = null;
-        let expenseChartInstance  = null;
-        let monthlyChartInstance  = null;
-
-        function showToast(msg, type = 'success') {
-            toast.textContent = msg;
-            toast.className = 'toast ' + type;
-            clearTimeout(toastTimer);
-            void toast.offsetWidth;
-            toast.classList.add('show');
-            toastTimer = setTimeout(() => toast.classList.remove('show'), 3000);
-        }
-
-        function getStorageSuffix() {
-            return getSyncUserKey() || DEVICE_ID;
-        }
-
-        function storageKey(name) {
-            return `myexpense_${name}_${getStorageSuffix()}`;
-        }
-
-        function generateAvatarInitials(name) {
-            if (!name) return '👤';
-            const parts = name.trim().split(/\s+/);
-            if (parts.length >= 2) {
-                return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
-            }
-            return (parts[0][0] || '?').toUpperCase();
-        }
-
-        function updateUserUi() {
-            const userAvatar = document.getElementById('userAvatar');
-            if (currentUser) {
-                userLabel.textContent = currentUser.name;
-                const initials = generateAvatarInitials(currentUser.name);
-                userAvatar.textContent = initials;
-                userAvatar.style.background = getInitialColor(initials);
-            } else {
-                userLabel.textContent = 'Login';
-                userAvatar.textContent = '👤';
-                userAvatar.style.background = 'rgba(255,255,255,0.25)';
-            }
-            setSyncStatus(currentUser ? 'local' : 'guest');
-        }
-
-        function getInitialColor(initials) {
-            const colors = [
-                'linear-gradient(135deg, #4f46e5, #818cf8)',
-                'linear-gradient(135deg, #ef4444, #f87171)',
-                'linear-gradient(135deg, #10b981, #6ee7b7)',
-                'linear-gradient(135deg, #f59e0b, #fcd34d)',
-                'linear-gradient(135deg, #8b5cf6, #c4b5fd)',
-                'linear-gradient(135deg, #ec4899, #f472b6)',
-                'linear-gradient(135deg, #3b82f6, #93c5fd)',
-                'linear-gradient(135deg, #06b6d4, #67e8f9)'
-            ];
-            let hash = 0;
-            for (let i = 0; i < initials.length; i++) {
-                hash = initials.charCodeAt(i) + ((hash << 5) - hash);
-            }
-            return colors[Math.abs(hash) % colors.length];
-        }
-
-        function openAuthModal() {
-            loginNameInput.value = currentUser?.name || '';
-            loginPinInput.value = '';
-            authOverlay.classList.add('open');
-            loginNameInput.focus();
-        }
-
-        function closeAuthModal() {
-            authOverlay.classList.remove('open');
-        }
-
-        async function handleLogin() {
-            const name = loginNameInput.value.trim();
-            const pin = loginPinInput.value.trim();
-            const key = makeUserKey(name, pin);
-            if (!name) { alert('Sila masukkan nama pengguna.'); return; }
-            if (!pin) { alert('Sila masukkan PIN sync.'); return; }
-            currentUser = { name, key };
-            saveCurrentUser(currentUser);
-            loadEntries();
-            loadDeletedEntryIds();
-            render();
-            updateUserUi();
-            closeAuthModal();
-            showToast('Login berjaya. Sync dimulakan.');
-            if (navigator.onLine) await loadFromSupabase().then(() => syncToSupabase());
-        }
-
-        function handleLogout() {
-            saveEntries();
-            saveDeletedEntryIds();
-            currentUser = null;
-            saveCurrentUser(null);
-            loadEntries();
-            loadDeletedEntryIds();
-            render();
-            updateUserUi();
-            closeAuthModal();
-            showToast('Logout. Data baru akan disimpan tempatan.');
-        }
-
-        // ===================== LOCAL STORAGE =====================
-        function loadEntries() {
-            try {
-                let data = localStorage.getItem(storageKey('entries'));
-                if (!data && !getSyncUserKey()) data = localStorage.getItem('myexpense_entries');
-                if (!data && getSyncUserKey()) data = localStorage.getItem('myexpense_entries');
-                entries = data ? JSON.parse(data) : [];
-                entries = entries.filter(e => e && e.id && e.amount && e.category);
-            } catch { entries = []; }
-        }
-
-        function saveEntries() {
-            localStorage.setItem(storageKey('entries'), JSON.stringify(entries));
-        }
-
-        function loadDeletedEntryIds() {
-            try {
-                let data = localStorage.getItem(storageKey('deleted_entry_ids'));
-                if (!data) data = localStorage.getItem('myexpense_deleted_entry_ids');
-                deletedEntryIds = data ? JSON.parse(data) : [];
-                deletedEntryIds = deletedEntryIds.filter(Boolean);
-            } catch { deletedEntryIds = []; }
-        }
-
-        function saveDeletedEntryIds() {
-            localStorage.setItem(storageKey('deleted_entry_ids'), JSON.stringify(deletedEntryIds));
-        }
-
-        function queueDeletedEntryIds(ids) {
-            const next = new Set(deletedEntryIds);
-            ids.filter(Boolean).forEach(id => next.add(id));
-            deletedEntryIds = Array.from(next);
-            saveDeletedEntryIds();
-        }
-
-        function clearDeletedEntryIds(ids) {
-            const synced = new Set(ids);
-            deletedEntryIds = deletedEntryIds.filter(id => !synced.has(id));
-            saveDeletedEntryIds();
-        }
-
-        function getEntriesForMonth(month, year) {
-            return entries.filter(e => {
-                const d = new Date(e.date);
-                return d.getMonth() === month && d.getFullYear() === year;
-            });
-        }
-
-        // ===================== SUPABASE SYNC (REST) =====================
-        function setSyncStatus(status) {
-            syncStatus.className = 'sync-status';
-            if (status === 'synced') {
-                syncStatus.textContent = '✓ sync';
-                syncStatus.classList.add('synced');
-            } else if (status === 'syncing') {
-                syncStatus.textContent = '⟳ sync...';
-                syncStatus.classList.add('syncing');
-            } else if (status === 'error') {
-                syncStatus.textContent = '✗ sync error';
-                syncStatus.classList.add('error');
-            } else if (status === 'guest') {
-                syncStatus.textContent = 'login untuk sync';
-            } else {
-                syncStatus.textContent = '○ tempatan';
-            }
-        }
-
-        async function syncToSupabase() {
-            const userKey = getSyncUserKey();
-            if (!navigator.onLine || isSyncing || !userKey) return;
-            isSyncing = true;
-            setSyncStatus('syncing');
-            try {
-                await syncDeletedEntries();
-                for (let i = 0; i < entries.length; i += 50) {
-                    const batch = entries.slice(i, i + 50).map(e => ({
-                        id: e.id,
-                        device_id: DEVICE_ID,
-                        user_key: userKey,
-                        category: e.category,
-                        amount: e.amount,
-                        date: e.date,
-                        note: e.note || '',
-                        created_at: e.createdAt || new Date().toISOString()
-                    }));
-                    const res = await SB('expenses?on_conflict=id', {
-                        method: 'POST',
-                        headers: { 'Prefer': 'resolution=merge-duplicates,return=minimal' },
-                        body: JSON.stringify(batch)
-                    });
-                    if (!res.ok) throw new Error('Sync failed');
+        const monthLabel = document.getElementById('monthLabel');
+        const grandTotalEl = document.getElementById('grandTotal');
+        const categoryGrid = document.getElementById('categoryGrid');
+        const entryList = document.getElementById('entryList');
+        const entryCountEl = document.getElementById('entryCount');
+        const MONTHS_MS = ['Januari', 'Februari', 'Mac', 'April', 'Mei', 'Jun', 'Julai', 'Ogos', 'September', 'Oktober', 'November', 'Disember'];
+        
+        function autoDetectDataMonth() {
+            if (expenses.length > 0) {
+                const validDates = expenses.map(e => new Date(e.date)).filter(d => !isNaN(d.getTime()));
+                if (validDates.length > 0) {
+                    const latest = new Date(Math.max(...validDates));
+                    currentDate = new Date(latest.getFullYear(), latest.getMonth(), 1);
                 }
-                setSyncStatus('synced');
-            } catch (err) {
-                console.warn('Sync error:', err);
-                showToast(`Sync error: ${err.message || 'semak Supabase setup'}`, 'error');
-                setSyncStatus('error');
-            } finally {
-                isSyncing = false;
             }
         }
 
-        async function syncDeletedEntries() {
-            const userKey = getSyncUserKey();
-            if (deletedEntryIds.length === 0 || !userKey) return;
-            const syncedIds = [];
-            for (let i = 0; i < deletedEntryIds.length; i += 50) {
-                const batch = deletedEntryIds.slice(i, i + 50);
-                const idList = batch.map(id => `id.eq.${encodeURIComponent(id)}`).join(',');
-                await SB(`expenses?user_key=eq.${encodeURIComponent(userKey)}&or=(${idList})`, { method: 'DELETE' });
-                syncedIds.push(...batch);
-            }
-            clearDeletedEntryIds(syncedIds);
+        function updateMonthDisplay() {
+            monthLabel.innerText = `${MONTHS_MS[currentDate.getMonth()]} ${currentDate.getFullYear()}`;
+            renderApp();
         }
 
-        async function loadFromSupabase() {
-            const userKey = getSyncUserKey();
-            if (!navigator.onLine || !userKey) return;
-            setSyncStatus('syncing');
-            try {
-                const qs = `user_key=eq.${encodeURIComponent(userKey)}&order=created_at.desc`;
-                const res = await SB(`expenses?${qs}`, { method: 'GET' });
-                if (!res.ok) throw new Error('Load failed');
-                const data = await res.json();
+        document.getElementById('prevMonth').addEventListener('click', () => { currentDate.setMonth(currentDate.getMonth() - 1); updateMonthDisplay(); });
+        document.getElementById('nextMonth').addEventListener('click', () => { currentDate.setMonth(currentDate.getMonth() + 1); updateMonthDisplay(); });
 
-                if (data && data.length > 0) {
-                    const deletedIds = new Set(deletedEntryIds);
-                    const remoteRows = data.filter(e => !deletedIds.has(e.id));
-                    const sbIds = new Set(remoteRows.map(e => e.id));
-                    const localOnly = entries.filter(e => !sbIds.has(e.id));
-                    const remote = remoteRows.map(e => ({
-                        id: e.id,
-                        category: e.category,
-                        amount: parseFloat(e.amount),
-                        date: e.date,
-                        note: e.note || '',
-                        createdAt: e.created_at
-                    }));
-                    entries = [...remote, ...localOnly];
-                    saveEntries();
-                    render();
-                }
-                setSyncStatus('synced');
-            } catch (err) {
-                console.warn('Load error:', err);
-                setSyncStatus('error');
-            }
-        }
+        function renderApp() {
+            const targetMonth = currentDate.getMonth(); 
+            const targetYear = currentDate.getFullYear();
 
-        // ===================== EXPORT / IMPORT =====================
-        function exportData() {
-            if (entries.length === 0) { showToast('Tiada data untuk dieksport', 'error'); return; }
-            const blob = new Blob([JSON.stringify(entries, null, 2)], { type: 'application/json' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = `myexpense_backup_${new Date().toISOString().slice(0,10)}.json`;
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-            URL.revokeObjectURL(url);
-            showToast(`✓ Dieksport: ${entries.length} rekod`);
-        }
-
-        function importData(file) {
-            const reader = new FileReader();
-            reader.onload = (e) => {
-                try {
-                    const data = JSON.parse(e.target.result);
-                    if (!Array.isArray(data) || data.length === 0) { showToast('Format fail tidak sah', 'error'); return; }
-                    if (!data.every(d => d.id && d.category && d.amount && d.date)) { showToast('Data tidak lengkap', 'error'); return; }
-                    const existingIds = new Set(entries.map(e => e.id));
-                    const newEntries = data.filter(e => !existingIds.has(e.id));
-                    const updates = data.filter(e => existingIds.has(e.id));
-                    entries = entries.map(e => {
-                        const u = updates.find(x => x.id === e.id);
-                        return u || e;
-                    });
-                    entries.push(...newEntries);
-                    saveEntries();
-                    render();
-                    showToast(`✓ Diimport: ${newEntries.length} baru + ${updates.length} dikemas kini`);
-                    syncToSupabase();
-                } catch { showToast('Gagal baca fail.', 'error'); }
-            };
-            reader.readAsText(file);
-            importFileInput.value = '';
-        }
-
-        // ===================== RENDER =====================
-        function renderMonthlyChart() {
-            const monthlyData = [];
-            const labels = [];
-            const today = new Date();
-            
-            for (let i = 5; i >= 0; i--) {
-                const d = new Date(today.getFullYear(), today.getMonth() - i, 1);
-                const month = d.getMonth();
-                const year = d.getFullYear();
-                const monthEntries = getEntriesForMonth(month, year);
-                const total = monthEntries.reduce((s, e) => s + e.amount, 0);
-                
-                labels.push(`${MONTHS[month].slice(0, 3)}\n${year}`);
-                monthlyData.push(total);
-            }
-            
-            if (monthlyData.every(v => v === 0)) {
-                monthlyChartSection.style.display = 'none';
-                if (monthlyChartInstance) {
-                    monthlyChartInstance.destroy();
-                    monthlyChartInstance = null;
-                }
-                return;
-            }
-            
-            monthlyChartSection.style.display = 'block';
-            const ctx = monthlyChartCanvas.getContext('2d');
-            const maxAmount = Math.max(...monthlyData) * 1.1;
-            
-            if (monthlyChartInstance) {
-                monthlyChartInstance.data.labels = labels;
-                monthlyChartInstance.data.datasets[0].data = monthlyData;
-                monthlyChartInstance.options.scales.y.max = maxAmount;
-                monthlyChartInstance.update();
-            } else {
-                monthlyChartInstance = new Chart(ctx, {
-                    type: 'bar',
-                    data: {
-                        labels: labels,
-                        datasets: [{
-                            label: 'Jumlah Perbelanjaan (RM)',
-                            data: monthlyData,
-                            backgroundColor: '#4f46e5',
-                            borderColor: '#3730a3',
-                            borderWidth: 1,
-                            borderRadius: 6,
-                            hoverBackgroundColor: '#3730a3',
-                            hoverBorderColor: '#1e1b4b',
-                            hoverBorderWidth: 2
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        indexAxis: 'x',
-                        plugins: {
-                            legend: {
-                                display: false
-                            },
-                            tooltip: {
-                                backgroundColor: 'rgba(0, 0, 0, 0.8)',
-                                titleFont: { size: 13, weight: '600' },
-                                bodyFont: { size: 12 },
-                                padding: 10,
-                                cornerRadius: 6,
-                                callbacks: {
-                                    label: function(context) {
-                                        return `RM ${context.parsed.y.toFixed(2)}`;
-                                    }
-                                }
-                            }
-                        },
-                        scales: {
-                            y: {
-                                beginAtZero: true,
-                                max: maxAmount,
-                                title: { display: true, text: 'Jumlah (RM)' },
-                                ticks: {
-                                    color: getComputedStyle(document.documentElement).getPropertyValue('--text-secondary'),
-                                    font: { size: 11 },
-                                    callback: function(value) {
-                                        return 'RM ' + value.toFixed(0);
-                                    }
-                                },
-                                grid: { color: getComputedStyle(document.documentElement).getPropertyValue('--border') }
-                            },
-                            x: {
-                                ticks: {
-                                    color: getComputedStyle(document.documentElement).getPropertyValue('--text-secondary'),
-                                    font: { size: 11 }
-                                },
-                                grid: { display: false }
-                            }
-                        }
+            const filtered = expenses.filter(exp => {
+                if (!exp.date) return false;
+                if (typeof exp.date === 'string' && exp.date.includes('-')) {
+                    const parts = exp.date.split('-');
+                    if (parts.length >= 2) {
+                        return parseInt(parts[0], 10) === targetYear && (parseInt(parts[1], 10) - 1) === targetMonth;
                     }
-                });
-            }
-        }
-
-        function render() {
-            const monthly = getEntriesForMonth(currentMonth, currentYear);
-            const total = monthly.reduce((sum, e) => sum + e.amount, 0);
-            const intPart = Math.floor(total);
-            const decPart = (total - intPart).toFixed(2).slice(1);
-            grandTotal.innerHTML = `RM ${intPart.toLocaleString()}<small>${decPart}</small>`;
-            monthLabel.textContent = `${MONTHS[currentMonth]} ${currentYear}`;
-            renderMonthlyChart();
-            renderChart(monthly);
-            renderCategories(monthly, total);
-            renderEntries(monthly);
-            entryCount.textContent = `${monthly.length} rekod`;
-        }
-
-        function renderChart(monthly) {
-            if (monthly.length === 0) {
-                chartSection.style.display = 'none';
-                if (expenseChartInstance) {
-                    expenseChartInstance.destroy();
-                    expenseChartInstance = null;
                 }
-                return;
-            }
-            const catData = CATEGORIES.map(cat => ({
-                label: cat.label,
-                emoji: cat.emoji,
-                id: cat.id,
-                color: cat.color
-            }));
-            const colorMap = {
-                'cat-bil': '#ef4444',
-                'cat-pendidikan': '#3b82f6',
-                'cat-petrol': '#f59e0b',
-                'cat-dapur': '#10b981',
-                'cat-pinjaman': '#8b5cf6',
-                'cat-lain': '#ec4899'
-            };
-            const labels = [];
-            const amounts = [];
-            const colors = [];
-            catData.forEach(cat => {
-                const catEntries = monthly.filter(e => e.category === cat.id);
-                const catTotal = catEntries.reduce((s, e) => s + e.amount, 0);
-                if (catTotal > 0) {
-                    labels.push(`${cat.emoji} ${cat.label}`);
-                    amounts.push(catTotal);
-                    colors.push(colorMap[cat.color]);
-                }
+                const d = new Date(exp.date);
+                return !isNaN(d.getTime()) && d.getFullYear() === targetYear && d.getMonth() === targetMonth;
             });
-            if (amounts.length === 0) {
-                chartSection.style.display = 'none';
-                if (expenseChartInstance) {
-                    expenseChartInstance.destroy();
-                    expenseChartInstance = null;
-                }
-                return;
-            }
-            chartSection.style.display = 'block';
-            const ctx = chartCanvas.getContext('2d');
-            const maxAmount = Math.max(...amounts) * 1.1;
-            
-            if (expenseChartInstance) {
-                expenseChartInstance.data.labels = labels;
-                expenseChartInstance.data.datasets[0].data = amounts;
-                expenseChartInstance.data.datasets[0].backgroundColor = colors;
-                expenseChartInstance.options.scales.y.max = maxAmount;
-                expenseChartInstance.update();
-            } else {
-                expenseChartInstance = new Chart(ctx, {
-                    type: 'bar',
-                    data: {
-                        labels: labels,
-                        datasets: [{
-                            label: 'Jumlah Perbelanjaan (RM)',
-                            data: amounts,
-                            backgroundColor: colors,
-                            borderWidth: 1,
-                            borderRadius: 6,
-                            hoverBorderWidth: 2
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        indexAxis: 'x',
-                        plugins: {
-                            legend: {
-                                display: false
-                            },
-                            tooltip: {
-                                backgroundColor: 'rgba(0, 0, 0, 0.8)',
-                                titleFont: { size: 13, weight: '600' },
-                                bodyFont: { size: 12 },
-                                padding: 10,
-                                cornerRadius: 6,
-                                callbacks: {
-                                    label: function(context) {
-                                        const value = context.parsed.y;
-                                        const total = context.dataset.data.reduce((a, b) => a + b, 0);
-                                        const pct = ((value / total) * 100).toFixed(1);
-                                        return [`RM ${value.toFixed(2)}`, `${pct}% daripada jumlah`];
-                                    }
-                                }
-                            }
-                        },
-                        scales: {
-                            y: {
-                                beginAtZero: true,
-                                max: maxAmount,
-                                ticks: {
-                                    color: getComputedStyle(document.documentElement).getPropertyValue('--text-secondary'),
-                                    font: { size: 11 },
-                                    callback: function(value) {
-                                        return 'RM ' + value.toFixed(0);
-                                    }
-                                },
-                                grid: { color: getComputedStyle(document.documentElement).getPropertyValue('--border') }
-                            },
-                            x: {
-                                ticks: {
-                                    color: getComputedStyle(document.documentElement).getPropertyValue('--text-secondary'),
-                                    font: { size: 11 }
-                                },
-                                grid: { display: false }
-                            }
-                        }
-                    }
-                });
-            }
-        }
 
-        function renderCategories(monthly, grandTotalAmount) {
+            let totalSum = filtered.reduce((sum, item) => sum + parseFloat(item.amount), 0);
+            grandTotalEl.innerText = `RM ${totalSum.toFixed(2)}`;
+            entryCountEl.innerText = `${filtered.length} rekod`;
+
+            let catTotals = { bil: 0, pendidikan: 0, petrol: 0, dapur: 0, pinjaman: 0, lain: 0 };
+            filtered.forEach(item => { if (catTotals[item.category] !== undefined) catTotals[item.category] += parseFloat(item.amount); });
+
             categoryGrid.innerHTML = '';
-            CATEGORIES.forEach(cat => {
-                const catEntries = monthly.filter(e => e.category === cat.id);
-                const catTotal = catEntries.reduce((s, e) => s + e.amount, 0);
-                const pct = grandTotalAmount > 0 ? (catTotal / grandTotalAmount) * 100 : 0;
-                const div = document.createElement('div');
-                div.className = `cat-card ${cat.color}`;
-                div.innerHTML = `<div class="cat-top"><div class="cat-icon">${cat.emoji}</div><span class="cat-name">${cat.label}</span><span class="cat-total">RM ${catTotal.toFixed(2)}</span></div><div class="cat-bar"><div class="cat-bar-fill" style="width:${pct}%"></div></div><div class="cat-count">${catEntries.length} transaksi</div>`;
-                categoryGrid.appendChild(div);
+            Object.keys(CATEGORIES).forEach(key => {
+                const total = catTotals[key];
+                const pct = totalSum > 0 ? (total / totalSum) * 100 : 0;
+                categoryGrid.innerHTML += `
+                    <div class="cat-card">
+                        <div class="cat-top">
+                            <span class="cat-name">${CATEGORIES[key].name}</span>
+                            <span class="cat-total">RM ${total.toFixed(2)}</span>
+                        </div>
+                        <div class="cat-bar"><div class="cat-bar-fill" style="width: ${pct}%; background: ${CATEGORIES[key].color};"></div></div>
+                    </div>
+                `;
             });
-        }
 
-        function renderEntries(monthly) {
             entryList.innerHTML = '';
-            if (monthly.length === 0) {
-                entryList.innerHTML = `<div class="entry-empty"><span class="emoji">📭</span><p>Tiada rekod untuk bulan ini.<br>Tekan + untuk tambah perbelanjaan.</p></div>`;
-                return;
-            }
-            const sorted = [...monthly].sort((a, b) => new Date(b.date) - new Date(a.date));
-            sorted.forEach(e => {
-                const cat = CATEGORIES.find(c => c.id === e.category) || CATEGORIES[5];
-                const d = new Date(e.date);
-                const dateStr = `${d.getDate()} ${MONTHS[d.getMonth()]} ${d.getFullYear()}`;
-                const div = document.createElement('div');
-                div.className = 'entry-item';
-                const ck = cat.color.split('-')[1];
-                div.innerHTML = `<div class="e-icon" style="background:var(--${ck}-bg);color:var(--${ck})">${cat.emoji}</div><div class="e-info"><div class="e-cat">${cat.label}</div><div class="e-note">${e.note || '—'}</div><div class="e-date">${dateStr}</div></div><div class="e-amount">RM ${e.amount.toFixed(2)}</div><button class="e-delete" data-id="${e.id}" aria-label="Padam">✕</button>`;
-                div.querySelector('.e-delete').addEventListener('click', (ev) => { ev.stopPropagation(); deleteEntry(e.id); });
-                entryList.appendChild(div);
-            });
-        }
-
-        // ===================== CRUD =====================
-        function addEntry(category, amount, date, note) {
-            const entry = {
-                id: Date.now().toString(36) + Math.random().toString(36).slice(2, 6),
-                category,
-                amount: Math.round(amount * 100) / 100,
-                date,
-                note: note.trim() || '',
-                createdAt: new Date().toISOString()
-            };
-            entries.push(entry);
-            saveEntries();
-            render();
-            syncToSupabase();
-        }
-
-        async function deleteEntry(id) {
-            if (!confirm('Padam rekod ini?')) return;
-            queueDeletedEntryIds([id]);
-            entries = entries.filter(e => e.id !== id);
-            saveEntries();
-            render();
-            const userKey = getSyncUserKey();
-            if (navigator.onLine && userKey) {
-                try {
-                    await SB(`expenses?id=eq.${encodeURIComponent(id)}&user_key=eq.${encodeURIComponent(userKey)}`, { method: 'DELETE' });
-                    clearDeletedEntryIds([id]);
-                } catch {}
-            }
-        }
-
-        function resetMonth() {
-            const monthly = getEntriesForMonth(currentMonth, currentYear);
-            if (monthly.length === 0) return;
-            if (!confirm(`Reset semua rekod untuk ${MONTHS[currentMonth]} ${currentYear}?`)) return;
-            const idsToRemove = new Set(monthly.map(e => e.id));
-            queueDeletedEntryIds(Array.from(idsToRemove));
-            entries = entries.filter(e => !idsToRemove.has(e.id));
-            saveEntries();
-            render();
-            if (navigator.onLine && idsToRemove.size > 0) {
-                syncDeletedEntries().catch(() => {});
-            }
-        }
-
-        function openModal() {
-            const today = new Date();
-            dateInput.value = (today.getMonth() === currentMonth && today.getFullYear() === currentYear)
-                ? today.toISOString().slice(0, 10)
-                : `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}-01`;
-            amountInput.value = '';
-            noteInput.value = '';
-            catSelect.value = 'bil';
-            modalOverlay.classList.add('open');
-            amountInput.focus();
-        }
-
-        function closeModal() { modalOverlay.classList.remove('open'); }
-
-        function handleSave() {
-            const category = catSelect.value;
-            const amount = parseFloat(amountInput.value);
-            const date = dateInput.value;
-            const note = noteInput.value;
-            if (!category) { alert('Sila pilih kategori.'); return; }
-            if (!amount || amount <= 0) { alert('Sila masukkan jumlah yang sah.'); return; }
-            if (!date) { alert('Sila pilih tarikh.'); return; }
-            addEntry(category, amount, date, note);
-            closeModal();
-            showToast('✓ Rekod disimpan');
-        }
-
-        function goPrevMonth() {
-            currentMonth--;
-            if (currentMonth < 0) { currentMonth = 11; currentYear--; }
-            render();
-        }
-        function goNextMonth() {
-            currentMonth++;
-            if (currentMonth > 11) { currentMonth = 0; currentYear++; }
-            render();
-        }
-
-        function isStandaloneApp() {
-            return window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
-        }
-
-        window.addEventListener('beforeinstallprompt', (event) => {
-            event.preventDefault();
-            deferredInstallPrompt = event;
-            console.log('✓ beforeinstallprompt event fired - Install button akan muncul');
-            if (!isStandaloneApp()) {
-                installBtn.classList.add('show');
-                console.log('✓ Install button shown');
+            if (filtered.length === 0) {
+                entryList.innerHTML = `<div class="entry-empty">📭<br>Tiada rekod data dijumpai pada bulan ini.</div>`;
             } else {
-                console.log('ℹ App sudah dalam standalone mode (sudah dipasang)');
+                filtered.forEach(item => {
+                    entryList.innerHTML += `
+                        <div class="entry-item">
+                            <div class="e-info">
+                                <span class="e-cat" style="color:${CATEGORIES[item.category].color}">${CATEGORIES[item.category].name}</span>
+                                <span class="e-note">${item.note || '-'}</span>
+                                <span class="e-date">${item.date}</span>
+                            </div>
+                            <div class="e-right">
+                                <span class="e-amount">RM ${parseFloat(item.amount).toFixed(2)}</span>
+                                <button class="e-delete" onclick="deleteExpense('${item.id}')">✕</button>
+                            </div>
+                        </div>
+                    `;
+                });
+            }
+            
+            renderChart(catTotals);
+            renderCompareChart(targetYear);
+        }
+
+        // AKSI DAFTAR TRANSAKSI
+        document.getElementById('fabBtn').addEventListener('click', () => {
+            document.getElementById('dateInput').value = new Date().toISOString().split('T')[0];
+            document.getElementById('modalOverlay').classList.add('open');
+        });
+        document.getElementById('cancelBtn').addEventListener('click', () => document.getElementById('modalOverlay').classList.remove('open'));
+
+        document.getElementById('saveBtn').addEventListener('click', async () => {
+            const category = document.getElementById('catSelect').value;
+            const amount = document.getElementById('amountInput').value;
+            const date = document.getElementById('dateInput').value; 
+            const note = document.getElementById('noteInput').value.trim();
+
+            if (!amount || amount <= 0 || !date) { showToast('Sila isi maklumat sah!', 'error'); return; }
+
+            const newRecord = {
+                id: 'id_' + Date.now(),
+                category: category,
+                amount: parseFloat(amount),
+                date: date,
+                note: note,
+                user_key: localStorage.getItem('myexpense_user_key') || 'tempatan',
+                username_raw: localStorage.getItem('myexpense_user_name') || 'tempatan'
+            };
+
+            expenses.unshift(newRecord);
+            localStorage.setItem('myexpense_data', JSON.stringify(expenses));
+            document.getElementById('modalOverlay').classList.remove('open');
+            document.getElementById('amountInput').value = '';
+            document.getElementById('noteInput').value = '';
+
+            showToast('Rekod disimpan setempat!');
+            const parts = date.split('-');
+            currentDate = new Date(parseInt(parts[0],10), parseInt(parts[1],10)-1, 1);
+            updateMonthDisplay();
+            await syncInsertToSupabase(newRecord);
+        });
+
+        window.deleteExpense = async function(id) {
+            if (confirm('Padam rekod ini?')) {
+                expenses = expenses.filter(exp => exp.id !== id);
+                localStorage.setItem('myexpense_data', JSON.stringify(expenses));
+                renderApp();
+                await syncDeleteFromSupabase(id);
+            }
+        };
+
+        document.getElementById('resetBtn').addEventListener('click', () => {
+            if (confirm('Reset keseluruhan data paparan bulan ini?')) {
+                expenses = [];
+                localStorage.setItem('myexpense_data', JSON.stringify(expenses));
+                renderApp();
             }
         });
 
-        installBtn.addEventListener('click', async () => {
-            if (!deferredInstallPrompt) {
-                console.warn('✗ deferredInstallPrompt is null - beforeinstallprompt tidak tersedia');
+        // FUNGSI UTAMA: PENYELESAIAN MASALAH WARNA HITAM DAN REKA BENTUK DONUT
+        function renderChart(catTotals) {
+            if (typeof Chart === 'undefined') return;
+            const ctx = document.getElementById('expenseChart').getContext('2d');
+            
+            // Mengunci susunan indeks bagi kategori
+            const catKeys = Object.keys(CATEGORIES);
+            
+            // Pemetaan data nilai RM, kod warna, dan nama label berdasarkan indeks yang seragam
+            const dataValues = catKeys.map(key => catTotals[key] || 0);
+            const colors = catKeys.map(key => CATEGORIES[key].color);
+            const labels = catKeys.map(key => CATEGORIES[key].name);
+            
+            if (!dataValues.some(v => v > 0)) { 
+                document.getElementById('chartSection').style.display = 'none'; 
+                return; 
+            }
+            
+            document.getElementById('chartSection').style.display = 'block';
+            
+            if (myChart) { 
+                myChart.data.labels = labels;
+                myChart.data.datasets[0].data = dataValues; 
+                myChart.data.datasets[0].backgroundColor = colors;
+                myChart.update(); 
+            } else {
+                myChart = new Chart(ctx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: labels,
+                        datasets: [{ 
+                            data: dataValues, 
+                            backgroundColor: colors,
+                            borderWidth: 2,
+                            borderColor: 'var(--surface)'
+                        }]
+                    },
+                    options: { 
+                        responsive: true, 
+                        maintainAspectRatio: false, 
+                        plugins: { 
+                            legend: { 
+                                display: true, 
+                                position: 'bottom',
+                                labels: {
+                                    boxWidth: 12,
+                                    padding: 10,
+                                    font: { size: 11, family: 'Segoe UI' },
+                                    color: 'var(--text-secondary)'
+                                }
+                            }, 
+                            tooltip: { 
+                                enabled: true,
+                                callbacks: {
+                                    label: function(context) {
+                                        let value = context.raw || 0;
+                                        return ` ${context.label}: RM ${value.toFixed(2)}`;
+                                    }
+                                }
+                            } 
+                        },
+                        cutout: '65%'
+                    }
+                });
+            }
+        }
+
+        // CARTA 2: BAR CHART (PERBANDINGAN BULANAN)
+        function renderCompareChart(targetYear) {
+            if (typeof Chart === 'undefined') return;
+            const ctx = document.getElementById('compareChart').getContext('2d');
+            
+            let monthlyTotals = new Array(12).fill(0);
+            expenses.forEach(exp => {
+                if (!exp.date) return;
+                let itemMonth = -1;
+                let itemYear = -1;
+                
+                if (typeof exp.date === 'string' && exp.date.includes('-')) {
+                    const parts = exp.date.split('-');
+                    if (parts.length >= 2) {
+                        itemYear = parseInt(parts[0], 10);
+                        itemMonth = parseInt(parts[1], 10) - 1;
+                    }
+                } else {
+                    const d = new Date(exp.date);
+                    if (!isNaN(d.getTime())) {
+                        itemYear = d.getFullYear();
+                        itemMonth = d.getMonth();
+                    }
+                }
+                if (itemYear === targetYear && itemMonth >= 0 && itemMonth < 12) {
+                    monthlyTotals[itemMonth] += parseFloat(exp.amount);
+                }
+            });
+
+            if (!monthlyTotals.some(v => v > 0)) {
+                document.getElementById('compareChartSection').style.display = 'none';
                 return;
             }
-            console.log('→ Install prompt dimulai...');
-            installBtn.classList.remove('show');
-            deferredInstallPrompt.prompt();
-            const userChoice = await deferredInstallPrompt.userChoice;
-            console.log('✓ User choice:', userChoice.outcome);
-            deferredInstallPrompt = null;
-        });
 
-        window.addEventListener('appinstalled', () => {
-            deferredInstallPrompt = null;
-            installBtn.classList.remove('show');
-            console.log('✓ App sudah dipasang dengan jayanya!');
-            showToast('App sudah dipasang');
-        });
+            document.getElementById('compareChartSection').style.display = 'block';
+            const shortMonths = ['Jan', 'Feb', 'Mac', 'Apr', 'Mei', 'Jun', 'Jul', 'Ogos', 'Sep', 'Okt', 'Nov', 'Dis'];
 
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () => {
-                navigator.serviceWorker.register('./sw.js').then(r => {
-                    r.update();
-                    console.log('✓ Service Worker berjaya:', r.scope);
-                }).catch(e => {
-                    console.warn('✗ Service Worker gagal:', e);
+            if (compareChart) {
+                compareChart.data.datasets[0].data = monthlyTotals;
+                compareChart.options.plugins.title.text = `Tahun ${targetYear}`;
+                compareChart.update();
+            } else {
+                compareChart = new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: shortMonths,
+                        datasets: [{
+                            label: 'Jumlah Belanja (RM)',
+                            data: monthlyTotals,
+                            backgroundColor: '#6366f1',
+                            borderRadius: 6,
+                            borderSkipped: false,
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: { display: false },
+                            title: { display: true, text: `Tahun ${targetYear}`, font: { size: 11, family: 'Segoe UI' }, color: 'var(--text-secondary)' }
+                        },
+                        scales: {
+                            y: { beginAtZero: true, grid: { display: false }, ticks: { font: { size: 10 }, color: 'var(--text-muted)' } },
+                            x: { grid: { display: false }, ticks: { font: { size: 10 }, color: 'var(--text-muted)' } }
+                        }
+                    }
                 });
-            });
-        } else {
-            console.warn('✗ Service Worker tidak disokong');
+            }
+        }
+
+        // KAWALAN DIALOG LOGIN
+        const authOverlay = document.getElementById('authOverlay');
+        document.getElementById('userBtn').addEventListener('click', () => authOverlay.classList.add('open'));
+        document.getElementById('authCancelBtn').addEventListener('click', () => authOverlay.classList.remove('open'));
+        document.getElementById('authSaveBtn').addEventListener('click', () => {
+            const username = document.getElementById('loginNameInput').value.trim().toLowerCase();
+            const pin = document.getElementById('loginPinInput').value.trim();
+            if (!username || pin.length !== 4) { showToast('PIN mestilah 4 digit!', 'error'); return; }
+            localStorage.setItem('myexpense_user_name', username);
+            localStorage.setItem('myexpense_user_key', btoa(`${username}:${pin}`));
+            authOverlay.classList.remove('open');
+            checkLoginStatus();
+        });
+
+        function checkLoginStatus() {
+            const savedName = localStorage.getItem('myexpense_user_name');
+            if (savedName) {
+                document.getElementById('userLabel').innerText = savedName.toUpperCase();
+                document.getElementById('userAvatar').innerText = savedName.charAt(0).toUpperCase();
+                fetchFromSupabaseNoFilter();
+            }
+        }
+
+        // SINKRONISASI DATA DARI AWAN (SUPABASE)
+        async function fetchFromSupabaseNoFilter() {
+            if (!supabaseClient) { updateSyncStatus('error', '⚠ Offline'); return; }
+            updateSyncStatus('syncing', '↻ Membaca data...');
+            try {
+                const { data, error } = await supabaseClient.from('expenses').select('*');
+                if (error) throw error;
+                
+                if (data && data.length > 0) {
+                    let localMap = new Map(expenses.map(obj => [obj.id, obj]));
+                    data.forEach(item => {
+                        if(item.id) localMap.set(item.id, item);
+                    });
+                    expenses = Array.from(localMap.values());
+                    localStorage.setItem('myexpense_data', JSON.stringify(expenses));
+                    
+                    showToast(`Berjaya menarik masuk ${data.length} rekod dari awan!`, 'success');
+                } else {
+                    showToast('Pangkalan data Supabase anda kosong.');
+                }
+                autoDetectDataMonth();
+                updateMonthDisplay();
+                updateSyncStatus('synced', '✓ Berjaya');
+            } catch (err) {
+                console.error(err);
+                updateSyncStatus('error', '⚠ Ralat Synchronize');
+            }
+        }
+
+        document.getElementById('forceSyncBtn').addEventListener('click', () => {
+            fetchFromSupabaseNoFilter();
+        });
+
+        async function syncInsertToSupabase(record) {
+            if (!supabaseClient) return;
+            try { await supabaseClient.from('expenses').insert([record]); } catch (e) { console.error(e); }
+        }
+
+        async function syncDeleteFromSupabase(id) {
+            if (!supabaseClient) return;
+            try { await supabaseClient.from('expenses').delete().eq('id', id); } catch (e) {}
+        }
+
+        function updateSyncStatus(status, text) {
+            const el = document.getElementById('syncStatus');
+            if(el) { el.className = `sync-status ${status}`; el.innerText = text; }
+        }
+
+        function showToast(message, type = 'success') {
+            const t = document.getElementById('toast');
+            if(t) { t.innerText = message; t.className = `toast show ${type}`; setTimeout(() => t.classList.remove('show'), 3000); }
         }
 
         window.addEventListener('load', () => {
-            console.log('=== MyExpense PWA Diagnostic ===');
-            console.log('HTTPS:', location.protocol === 'https:' ? '✓' : '✗ (localhost OK, HTTPS required for deployment)');
-            console.log('Standalone mode:', isStandaloneApp() ? '✓ (already installed)' : '✗ (not installed)');
-            console.log('Service Worker:', 'serviceWorker' in navigator ? '✓' : '✗');
-            console.log('Manifest:', document.querySelector('link[rel="manifest"]') ? '✓' : '✗');
-            console.log('beforeinstallprompt ready:', deferredInstallPrompt ? '✓' : '✗ (not fired yet - wait a moment or refresh)');
-            console.log('================================');
+            autoDetectDataMonth();
+            updateMonthDisplay();
+            checkLoginStatus();
         });
-
-        function updateOnlineStatus() {
-            offlineBanner.classList.toggle('show', !navigator.onLine);
-            if (navigator.onLine) { syncToSupabase(); loadFromSupabase(); }
-        }
-        window.addEventListener('online', updateOnlineStatus);
-        window.addEventListener('offline', updateOnlineStatus);
-        updateOnlineStatus();
-
-        prevMonth.addEventListener('click', goPrevMonth);
-        nextMonth.addEventListener('click', goNextMonth);
-        fabBtn.addEventListener('click', openModal);
-        cancelBtn.addEventListener('click', closeModal);
-        saveBtn.addEventListener('click', handleSave);
-        modalOverlay.addEventListener('click', (e) => { if (e.target === modalOverlay) closeModal(); });
-        amountInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') handleSave(); });
-        resetBtn.addEventListener('click', resetMonth);
-        exportBtn.addEventListener('click', exportData);
-        importBtn.addEventListener('click', () => importFileInput.click());
-        importFileInput.addEventListener('change', (e) => { if (e.target.files.length > 0) importData(e.target.files[0]); });
-        userBtn.addEventListener('click', openAuthModal);
-        loginBtn.addEventListener('click', handleLogin);
-        logoutBtn.addEventListener('click', handleLogout);
-        authOverlay.addEventListener('click', (e) => { if (e.target === authOverlay) closeAuthModal(); });
-        loginPinInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') handleLogin(); });
-
-        loadEntries();
-        loadDeletedEntryIds();
-        render();
-        updateUserUi();
-        if (navigator.onLine && getSyncUserKey()) { loadFromSupabase().then(() => syncToSupabase()); }
-
-        console.log('✓ MyExpense siap. Device:', DEVICE_ID);
     </script>
 </body>
 </html>
-
