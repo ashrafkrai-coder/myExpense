@@ -5,25 +5,25 @@
   "description": "Aplikasi merekod perbelanjaan bulanan — Bil, Pendidikan, Petrol, Dapur, Pinjaman, Lain-lain. Offline-ready, sync otomatis ke cloud.",
   "icons": [
     {
-      "src": "icons/icon-192.png",
+      "src": "./icons/icon-192.png",
       "type": "image/png",
       "sizes": "192x192",
       "purpose": "any"
     },
     {
-      "src": "icons/icon-192.png",
+      "src": "./icons/icon-192.png",
       "type": "image/png",
       "sizes": "192x192",
       "purpose": "maskable"
     },
     {
-      "src": "icons/icon-512.png",
+      "src": "./icons/icon-512.png",
       "type": "image/png",
       "sizes": "512x512",
       "purpose": "any"
     },
     {
-      "src": "icons/icon-512.png",
+      "src": "./icons/icon-512.png",
       "type": "image/png",
       "sizes": "512x512",
       "purpose": "maskable"

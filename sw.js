@@ -1,12 +1,14 @@
-const CACHE_NAME = 'myexpense-v2';
-const CACHE_VERSION = 'v1.1.0';
+const CACHE_NAME = 'myexpense-v3';
+const CACHE_VERSION = 'v1.2.0';
 
 const STATIC_ASSETS = [
   './',
   './index.html',
   './manifest.json',
   './icons/icon-192.png',
-  './icons/icon-512.png'
+  './icons/icon-512.png',
+  './icons/icon-192.svg',
+  './icons/icon-512.svg'
 ];
 
 // Install: cache all static assets
